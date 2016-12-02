@@ -1,16 +1,16 @@
 # SecretLens README
 
-A CodeLens provider that automatically decodes a line of text and show as a CodeLens.
+A CodeLens provider that automatically decrypts a line of text and show as a CodeLens.
 
 ## Features
 
-Show a CodeLens with text decoded from the line.
+Show a CodeLens with text decrypted from the line.
 
-If a line starts with `secretlens:` (configurable) then the rest of the line is decoded (can have a custom function) by a function and displayed inline.
+If a line starts with `secretlens:` (configurable) then the rest of the line is decrypted by a function (can be customized) and displayed inline.
 
-Has two commands:
-- `encode`: Encode the current line and puts the `startsWith` text in the begining
-- `decode`: Decode the current line and removes the `startsWith` text
+It has two commands:
+- `encrypt`: Encrypt the current line and puts the `startsWith` text in the begining
+- `decrypt`: Decrypt the current line and removes the `startsWith` text
 
 ## Extension Settings
 
@@ -21,19 +21,19 @@ This extension has the following settings:
 
 ### For use with a custom file (`secretFunctionFilePath` setting)
 
-The file contents should follow this spec.
+The file contents should follow this spec. The extension provide a code snippet (`slfunction`) to help the creation of that file.
 
-It should have a `encode` and a `decode` function with your custom code in it 
+It should have a `encrypt` and a `decrypt` function with your custom code in it.
 
 ```javascript
 "use strict";
 var MySecretFunction = (function () {
     function MySecretFunction() {
     }
-    MySecretFunction.prototype.encode = function (inputText) {
+    MySecretFunction.prototype.encrypt = function (inputText) {
         return inputText;
     };
-    MySecretFunction.prototype.decode = function (inputText) {
+    MySecretFunction.prototype.decrypt = function (inputText) {
         return inputText;
     };
     return MySecretFunction;
