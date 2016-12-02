@@ -35,6 +35,12 @@
                 "key": "ctrl+s ctrl+d"
             }
         ],
+        "snippets": [
+            {
+                "language": "javascript",
+                "path": "./snippets/javascript.json"
+            }
+        ],
         "configuration": {
             "title": "Configuration for Secret extension",
             "properties": {

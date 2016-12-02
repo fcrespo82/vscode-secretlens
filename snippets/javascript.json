@@ -1,0 +1,23 @@
+{
+    "SecretLens Function": {
+        "description": "Custom SecretLens Function",
+        "prefix": "slfunction",
+        "body": [
+            "\"use strict\";",
+            "var ${MySecretFunction} = (function () {",
+            "    function ${MySecretFunction}() {",
+            "    }",
+            "    ${MySecretFunction}.prototype.encrypt = function (decryptedText) {",
+            "        encryptedText = 'encryptedText';",
+            "        return encryptedText;",
+            "    };",
+            "    ${MySecretFunction}.prototype.decrypt = function (encryptedText) {",
+            "        decryptedText = 'decryptedText';",
+            "        return decryptedText;",
+            "    };",
+            "    return ${MySecretFunction};",
+            "} ());",
+            "exports.instance = new ${MySecretFunction}();"
+        ]
+    }
+}
