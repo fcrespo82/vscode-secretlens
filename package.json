@@ -2,8 +2,23 @@
     "name": "secretlens",
     "displayName": "SecretLens",
     "description": "Show a codelens decrypting a secret in the document",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "publisher": "fcrespo82",
+    "homepage": "https://github.com/fcrespo82/vscode-secretlens",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/fcrespo82/vscode-secretlens"
+    },
+    "bugs": {
+        "url": "https://github.com/fcrespo82/vscode-secretlens/issues"
+    },
+    "keywords": [
+        "secret",
+        "cypher",
+        "encrypt",
+        "decrypt"
+    ],
+
     "engines": {
         "vscode": "^1.5.0"
     },
