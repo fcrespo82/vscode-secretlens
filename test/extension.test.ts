@@ -10,13 +10,24 @@ import * as assert from 'assert';
 // as well as import your extension to test it
 import * as vscode from 'vscode';
 import * as myExtension from '../src/extension';
+import { SecretLensFunctionDefault } from '../src/secretlens';
 
 // Defines a Mocha test suite to group tests of similar kind together
-suite("Extension Tests", () => {
+describe("secretlens", () => {
+    var cypher;
+    before(() => {
+        cypher = new SecretLensFunctionDefault();
+    });
 
-    // Defines a Mocha unit test
-    test("Something 1", () => {
-        assert.equal(-1, [1, 2, 3].indexOf(5));
-        assert.equal(-1, [1, 2, 3].indexOf(0));
+    context("encrypt", () => {
+        it("should encrypt correctly", () => {
+            assert.equal(cypher.encrypt('test'), 'E6DE');
+        });
+    });
+    context("decrypt", () => {
+        it("should decrypt correctly", () => {
+            assert.equal(cypher.decrypt('E6DE'), 'test');
+
+        });
     });
 });
