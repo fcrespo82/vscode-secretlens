@@ -1,11 +1,6 @@
-export interface ISecretLensFunction {
+import * as interfaces from './interfaces'
 
-    encode(inputText: string): string;
-    decode(inputText: string): string;
-
-}
-
-export class SecretFunctionDefault implements ISecretLensFunction {
+export class SecretLensFunctionDefault implements interfaces.ISecretLensFunction {
 
     private rot47(text) {
         var s = [];
@@ -20,11 +15,11 @@ export class SecretFunctionDefault implements ISecretLensFunction {
         return s.join('')
     }
 
-    encode(inputText: string): string {
+    encrypt(inputText: string): string {
         return this.rot47(inputText);
     }
 
-    decode(inputText: string): string {
+    decrypt(inputText: string): string {
         return this.rot47(inputText);
     }
 }
