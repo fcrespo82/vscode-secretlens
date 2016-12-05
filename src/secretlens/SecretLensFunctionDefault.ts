@@ -1,4 +1,6 @@
 import * as interfaces from './interfaces'
+import * as crypto from 'crypto'
+import * as vscode from 'vscode'
 
 export class SecretLensFunctionDefault implements interfaces.ISecretLensFunction {
 
@@ -16,10 +18,22 @@ export class SecretLensFunctionDefault implements interfaces.ISecretLensFunction
     }
 
     encrypt(inputText: string): string {
-        return this.rot47(inputText);
+        vscode.window.showInputBox({ password: true, prompt: "Password", placeHolder: "password" }).then(function (password) {
+            const cipher = crypto.createCipher('aes256', password);
+            var encrypted = cipher.update('some clear text data', 'utf8', 'hex');
+            encrypted += cipher.final('hex');
+            return encrypted;
+        })
+        
     }
 
     decrypt(inputText: string): string {
-        return this.rot47(inputText);
+        vscode.window.showInputBox({ password: true, prompt: "Password", placeHolder: "password" }).then(function (password) {
+            const decipher = crypto.createDecipher('aes256', password);
+            var decrypted = decipher.update(inputText, 'hex', 'utf8');
+            decrypted += decipher.final('utf8');
+
+            return decrypted;
+        });
     }
 }
