@@ -2,7 +2,7 @@
     "name": "secretlens",
     "displayName": "SecretLens",
     "description": "Show a codelens decrypting a secret in the document",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "publisher": "fcrespo82",
     "homepage": "https://github.com/fcrespo82/vscode-secretlens",
     "repository": {
@@ -18,7 +18,6 @@
         "encrypt",
         "decrypt"
     ],
-
     "engines": {
         "vscode": "^1.5.0"
     },
@@ -32,21 +31,21 @@
     "contributes": {
         "commands": [
             {
-                "title": "SecretLens: Encode",
-                "command": "secretlens.encode"
+                "title": "SecretLens: Encrypt",
+                "command": "secretlens.encrypt"
             },
             {
-                "title": "SecretLens: Decode",
-                "command": "secretlens.decode"
+                "title": "SecretLens: Decrypt",
+                "command": "secretlens.decrypt"
             }
         ],
         "keybindings": [
             {
-                "command": "secretlens.encode",
+                "command": "secretlens.encrypt",
                 "key": "ctrl+s ctrl+e"
             },
             {
-                "command": "secretlens.decode",
+                "command": "secretlens.decrypt",
                 "key": "ctrl+s ctrl+d"
             }
         ],
