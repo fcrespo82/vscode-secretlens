@@ -29,45 +29,38 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
         this.disposables.push(vscode.languages.registerCodeLensProvider(languages, this));
 
-        this.disposables.push(vscode.commands.registerCommand('secretlens.encrypt', () => {
-            this.execute(this.secretLensFunction.encrypt, 'encrypt', this.startsWith)
-        }, this));
+        this.disposables.push(vscode.commands.registerTextEditorCommand('secretlens.encrypt', this.execute, this));
 
-        this.disposables.push(vscode.commands.registerCommand('secretlens.decrypt', () => {
-            this.execute(this.secretLensFunction.decrypt, 'decrypt', this.startsWith)
-        }, this));
+        this.disposables.push(vscode.commands.registerTextEditorCommand('secretlens.decrypt', this.execute, this));
 
     }
 
-    private execute(the_function: Function, type: string, startsWith: string): Boolean {
+    execute(textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
 
-        var editor = vscode.window.activeTextEditor
-        if (!editor) {
+        if (!textEditor) {
             return false;
         }
 
-        var selections = editor.selections
+        textEditor.selections.forEach(selection => {
+            if (!selection.isSingleLine){
+                vscode.window.showWarningMessage("The extension can only be executed in single line selections")
+                return false
+            }
 
-        editor.edit((edits) => {
-            selections.forEach(selection => {
-                var line = editor.document.lineAt(selection.start.line)
-                var text = line.text;
+            var line = textEditor.document.lineAt(selection.start.line)
+            var text = line.text;
 
-                if (type == 'encrypt') {
-                    if (!text.startsWith(startsWith)) {
-                        text = startsWith + the_function(text)
-                    }
-                } else {
-                    if (text.startsWith(startsWith)) {
-                        text = text.replace(startsWith, "");
-                        text = the_function(text)
-                    }
-                }
-                edits.replace(line.range, text);
+            if (text.startsWith(this.startsWith)) {
+                text = text.replace(this.startsWith, "")
+                text = this.secretLensFunction.decrypt(text)
+                edit.replace(line.range, text);
+            } else if (!text.startsWith(this.startsWith) && text.length > 0) {
+                text = this.startsWith + this.secretLensFunction.encrypt(text)
+                edit.replace(line.range, text);
+            }
+        });
 
-            })
-        })
-        return true;
+        return true
     }
 
     dispose() {
@@ -86,7 +79,13 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
             if (line.startsWith(this.startsWith)) {
                 return index;
             }
-        }).filter(element => { return element })
+        })
+
+        mapped = mapped.filter(element => {
+            if (element != undefined && element >= 0) {
+                return element + 1
+            }
+        })
 
         this.codeLenses = [];
         mapped.forEach(lineNumber => {
