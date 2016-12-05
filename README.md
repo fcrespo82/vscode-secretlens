@@ -47,6 +47,10 @@ None
 
 ## Release Notes
 
+### 1.0.1
+
+Fixed a "Command not found bug" that prevents the extension to work completely 
+
 ### 1.0.0
 
 Initial release of SecretLens.
