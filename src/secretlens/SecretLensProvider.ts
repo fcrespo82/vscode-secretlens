@@ -33,21 +33,32 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
         this.disposables.push(vscode.commands.registerTextEditorCommand('secretlens.decrypt', this.execute, this));
 
+        var self = this;
+        this.disposables.push(vscode.commands.registerCommand('secretlens.setpassword', () => {
+            vscode.window.showInputBox({ password: true, prompt: "Password", placeHolder: "password" }).then(function(password) {
+                self.secretLensFunction.password = password;
+            });
+
+        }), this);
+
     }
 
-    execute(textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
-
+    execute(textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit, ...args: any[]) {
         if (!textEditor) {
             return false;
         }
 
         textEditor.selections.forEach(selection => {
-            if (!selection.isSingleLine){
+            if (!selection.isSingleLine) {
                 vscode.window.showWarningMessage("The extension can only be executed in single line selections")
                 return false
             }
-
             var line = textEditor.document.lineAt(selection.start.line)
+
+
+            if (args.length > 0 && typeof (args[0]) == 'number') {
+                line = textEditor.document.lineAt(args[0])
+            }
             var text = line.text;
 
             if (text.startsWith(this.startsWith)) {
@@ -55,13 +66,14 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
                 text = this.secretLensFunction.decrypt(text)
                 edit.replace(line.range, text);
             } else if (!text.startsWith(this.startsWith) && text.length > 0) {
-                text = this.startsWith + this.secretLensFunction.encrypt(text)
+                text = this.startsWith + this.secretLensFunction.encrypt(text);
                 edit.replace(line.range, text);
             }
         });
 
         return true
     }
+
 
     dispose() {
         if (this.disposables) {
@@ -101,7 +113,8 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
         codeLens.command = {
             title: this.startsWith + this.secretLensFunction.decrypt(text.replace(this.startsWith, "")),
-            command: 'secretlens.decrypt'
+            command: 'secretlens.decrypt',
+            arguments: [codeLens.range.start.line]
         }
 
         return codeLens;

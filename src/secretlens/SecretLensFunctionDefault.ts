@@ -4,6 +4,8 @@ import * as vscode from 'vscode'
 
 export class SecretLensFunctionDefault implements interfaces.ISecretLensFunction {
 
+    public password: string;
+
     private rot47(text) {
         var s = [];
         for (var i = 0; i < text.length; i++) {
@@ -18,22 +20,23 @@ export class SecretLensFunctionDefault implements interfaces.ISecretLensFunction
     }
 
     encrypt(inputText: string): string {
-        vscode.window.showInputBox({ password: true, prompt: "Password", placeHolder: "password" }).then(function (password) {
-            const cipher = crypto.createCipher('aes256', password);
-            var encrypted = cipher.update('some clear text data', 'utf8', 'hex');
-            encrypted += cipher.final('hex');
-            return encrypted;
-        })
-        
+        if (!this.password) {
+            vscode.commands.executeCommand('secretlens.setpassword');
+        }
+        const cipher = crypto.createCipher('aes256', this.password);
+        var encrypted = cipher.update(inputText, 'utf8', 'hex');
+        encrypted += cipher.final('hex');
+        return encrypted;
     }
 
     decrypt(inputText: string): string {
-        vscode.window.showInputBox({ password: true, prompt: "Password", placeHolder: "password" }).then(function (password) {
-            const decipher = crypto.createDecipher('aes256', password);
-            var decrypted = decipher.update(inputText, 'hex', 'utf8');
-            decrypted += decipher.final('utf8');
+        if (!this.password) {
+            vscode.commands.executeCommand('secretlens.setpassword');
+        }
+        const decipher = crypto.createDecipher('aes256', this.password);
+        var decrypted = decipher.update(inputText, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
 
-            return decrypted;
-        });
+        return decrypted;
     }
 }
