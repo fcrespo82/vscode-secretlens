@@ -5,6 +5,7 @@ import * as vscode from 'vscode'
 export class SecretLensFunctionDefault implements interfaces.ISecretLensFunction {
 
     public password: string;
+    public hasPassword: boolean = true;
 
     private rot47(text) {
         var s = [];

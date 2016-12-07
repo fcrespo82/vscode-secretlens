@@ -29,32 +29,36 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
         this.disposables.push(vscode.languages.registerCodeLensProvider(languages, this));
 
-        this.disposables.push(vscode.commands.registerTextEditorCommand('secretlens.encrypt', this.execute, this));
+        this.disposables.push(vscode.commands.registerCommand('secretlens.encrypt', this.execute, this));
 
-        this.disposables.push(vscode.commands.registerTextEditorCommand('secretlens.decrypt', this.execute, this));
+        this.disposables.push(vscode.commands.registerCommand('secretlens.decrypt', this.execute, this));
+    }
 
-        var self = this;
-        this.disposables.push(vscode.commands.registerCommand('secretlens.setpassword', () => {
-            vscode.window.showInputBox({ password: true, prompt: "Password", placeHolder: "password" }).then(function(password) {
-                self.secretLensFunction.password = password;
+    execute(...args: any[]): PromiseLike<void> {
+
+        if (this.secretLensFunction.hasPassword) {
+            return vscode.window.showInputBox({ password: true, prompt: "What's the password to encrypt/decrypt this message?", placeHolder: "password" }).then(function (password) {
+                this.secretLensFunction.password = password;
             });
-
-        }), this);
+        } else {
+            return this.replace(args);
+        }
 
     }
 
-    execute(textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit, ...args: any[]) {
+    replace(...args: any[]): PromiseLike<void> {
+        var textEditor: vscode.TextEditor;
+        textEditor = vscode.window.activeTextEditor;
         if (!textEditor) {
-            return false;
+            return
         }
 
         textEditor.selections.forEach(selection => {
             if (!selection.isSingleLine) {
                 vscode.window.showWarningMessage("The extension can only be executed in single line selections")
-                return false
+                return
             }
             var line = textEditor.document.lineAt(selection.start.line)
-
 
             if (args.length > 0 && typeof (args[0]) == 'number') {
                 line = textEditor.document.lineAt(args[0])
@@ -64,16 +68,16 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
             if (text.startsWith(this.startsWith)) {
                 text = text.replace(this.startsWith, "")
                 text = this.secretLensFunction.decrypt(text)
-                edit.replace(line.range, text);
+                //edit.replace(line.range, text);
             } else if (!text.startsWith(this.startsWith) && text.length > 0) {
                 text = this.startsWith + this.secretLensFunction.encrypt(text);
-                edit.replace(line.range, text);
+                //edit.replace(line.range, text);
             }
+            textEditor.edit(edits => {
+                edits.replace(line.range, text)
+            })
         });
-
-        return true
     }
-
 
     dispose() {
         if (this.disposables) {

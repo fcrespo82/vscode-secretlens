@@ -1,6 +1,7 @@
 export interface ISecretLensFunction {
 
-    password:string;
+    password: string;
+    hasPassword: boolean;
     encrypt(inputText: string): string;
     decrypt(inputText: string): string;
 
