@@ -1,5 +1,11 @@
 ## Changelog
 
+### 1.1.0
+
+- Changed the default keymaps (old ones were conflicting with save)
+- Changed the custom code
+- Updated the code snippet to reflect above change
+
 ### 1.0.2
 
 - Fixed a wrong command firing, when executing the extension from the keybinding or the command pallete

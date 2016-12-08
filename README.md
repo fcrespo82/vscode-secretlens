@@ -6,7 +6,7 @@ A CodeLens provider that automatically decrypts a line of text and show as a Cod
 
 Show a CodeLens with text decrypted from the line.
 
-If a line starts with `secretlens:` (configurable) then the rest of the line is decrypted by a function (can be customized) and displayed inline.
+If a line starts with `secretlens:` (config option) then the rest of the line is decrypted by a function (config option) and displayed inline.
 
 It has two commands:
 - `encrypt`: Encrypt the current line and puts the `startsWith` text in the begining
@@ -17,51 +17,37 @@ It has two commands:
 This extension has the following settings:
 
 * `secretlens.startsWith`: Text for the extension to act upon line
-* `secretlens.secretFunctionFilePath`: File path for file with custom function for SecretLens to apply to your text
+* `secretlens.customSecretFunctionFilePath`: File path for file with custom function for SecretLens to apply to your text. [Default: undefined]
 
-### For use with a custom file (`secretFunctionFilePath` setting)
+### For use with a custom file (`customSecretFunctionFilePath` setting)
 
-The file contents should follow this spec. The extension provide a code snippet (`slfunction`) to help the creation of that file.
+The file contents should follow the following spec. The extension provide a code snippet (`slfunction`) to help the creation of that file.
 
 It should have a `encrypt` and a `decrypt` function with your custom code in it.
 
 ```javascript
 "use strict";
-var MySecretFunction = (function () {
-    function MySecretFunction() {
+var SecretLensFunction = (function () {
+    function SecretLensFunction() {
     }
-    MySecretFunction.prototype.encrypt = function (inputText) {
-        return inputText;
+    SecretLensFunction.prototype.encrypt = function (inputText) {
+        return "#" + inputText + "#";
     };
-    MySecretFunction.prototype.decrypt = function (inputText) {
-        return inputText;
+    SecretLensFunction.prototype.decrypt = function (inputText) {
+        return inputText.substring(1, inputText.length - 1);
     };
-    return MySecretFunction;
-} ());
-exports.instance = new MySecretFunction();
+    return SecretLensFunction;
+}());
+exports.customSecretFunction = SecretLensFunction;
 ``` 
 
 ## Known Issues
 
 None
 
-## Release Notes
-
-### 1.0.2
-
-- Fixed a wrong command firing, when executing the extension from the keybinding or the command pallete
-- Added a warning message to educate users on how to use the extension
-
-### 1.0.1
-
-- Fixed a "Command not found bug" that prevents the extension to work completely 
-
-### 1.0.0
-
-- Initial release of SecretLens.
-
 ## Roadmap
 
 - [ ] Use crypto api as the default implementation 
 - [ ] Ask for a password for encryption/decryption
 - [ ] Better tests
+- [ ] Added a TypeScript snippet but it must be converted to JS prior to use

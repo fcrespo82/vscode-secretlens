@@ -14,6 +14,7 @@
     },
     "keywords": [
         "secret",
+        "crypto",
         "cypher",
         "encrypt",
         "decrypt"
@@ -22,7 +23,9 @@
         "vscode": "^1.5.0"
     },
     "categories": [
-        "Other"
+        "Other",
+        "Snippets",
+        "Productivity"
     ],
     "activationEvents": [
         "*"
@@ -47,10 +50,6 @@
             {
                 "command": "secretlens.decrypt",
                 "key": "ctrl+l ctrl+d"
-            },
-            {
-                "command": "secretlens.setPassword",
-                "key": "ctrl+l ctrl+p"
             }
         ],
         "snippets": [
@@ -76,23 +75,10 @@
                         "*"
                     ]
                 },
-                "secretlens.customSecretFunction": {
-                    "title": "Custom Secret Function",
-                    "description": "Custom Secret Function",
-                    "type": "object",
-                    "default": {
-                        "shouldAskForPassword": true
-                    },
-                    "properties": {
-                        "shouldAskForPassword": {
-                            "description": "Should the extension ask for a password",
-                            "type": "boolean"
-                        },
-                        "filePath": {
-                            "description": "Path to the file",
-                            "type": "string"
-                        }
-                    }
+                "secretlens.customSecretFunctionFilePath": {
+                    "title": "Custom Secret Function file path",
+                    "description": "Custom Secret Function file path",
+                    "type": "string"
                 }
             }
         }

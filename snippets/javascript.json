@@ -4,20 +4,18 @@
         "prefix": "slfunction",
         "body": [
             "\"use strict\";",
-            "var ${MySecretFunction} = (function () {",
-            "    function ${MySecretFunction}() {",
+            "var ${SecretLensFunction} = (function () {",
+            "    function ${SecretLensFunction}() {",
             "    }",
-            "    ${MySecretFunction}.prototype.encrypt = function (decryptedText) {",
-            "        encryptedText = 'encryptedText';",
-            "        return encryptedText;",
+            "    ${SecretLensFunction}.prototype.encrypt = function (inputText) {",
+            "        return \"#\" + inputText + \"#\";",
             "    };",
-            "    ${MySecretFunction}.prototype.decrypt = function (encryptedText) {",
-            "        decryptedText = 'decryptedText';",
-            "        return decryptedText;",
+            "    ${SecretLensFunction}.prototype.decrypt = function (inputText) {",
+            "        return inputText.substring(1, inputText.length - 1);",
             "    };",
-            "    return ${MySecretFunction};",
-            "} ());",
-            "exports.instance = new ${MySecretFunction}();"
+            "    return ${SecretLensFunction};",
+            "}());",
+            "exports.customSecretFunction = ${SecretLensFunction};"
         ]
     }
 }
