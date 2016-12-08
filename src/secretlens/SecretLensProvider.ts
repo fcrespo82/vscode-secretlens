@@ -14,12 +14,12 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
     constructor() {
         this.startsWith = vscode.workspace.getConfiguration("secretlens").get<string>('startsWith');
 
-        var customSecretFunction: any = vscode.workspace.getConfiguration("secretlens").get<any>('customSecretFunction');
+        var customSecretFunctionFilePath: any = vscode.workspace.getConfiguration("secretlens").get<any>('customSecretFunctionFilePath');
 
-        this.secretLensFunction = new SecretLensFunctionDefault();
+        this.secretLensFunction = new SecretLensFunctionDefault()
 
-        if (customSecretFunction.filePath) {
-            this.secretLensFunction = require(customSecretFunction.filePath).instance;
+        if (customSecretFunctionFilePath) {
+            this.secretLensFunction = require(customSecretFunctionFilePath).customSecretFunction();
         }
 
     }
@@ -33,36 +33,10 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
         this.disposables.push(vscode.commands.registerCommand('secretlens.decrypt', this.execute, this));
 
-        this.disposables.push(vscode.commands.registerCommand('secretlens.setPassword', this.setPassword, this));
-
-    }
-
-    setPassword(): PromiseLike<void> {
-        if (this.secretLensFunction.shouldAskForPassword) {
-            var self = this;
-            return vscode.window.showInputBox({ password: true, prompt: "What's the password to encrypt/decrypt this message?", placeHolder: "password" }).then(function (password) {
-                self.secretLensFunction.password = password;
-            });
-        } else {
-            vscode.window.showInformationMessage("This command is disabled");
-        }
     }
 
     execute(...args: any[]): PromiseLike<void> {
-        var self = this;
-        if (self.secretLensFunction.shouldAskForPassword && self.secretLensFunction.password === undefined) {
-            return self.setPassword().then(function () {
-                return self.replace(args);
-            });
-        } else {
-            return self.replace(args);
-        }
-
-    }
-
-    replace(...args: any[]): PromiseLike<void> {
-        var textEditor: vscode.TextEditor;
-        textEditor = vscode.window.activeTextEditor;
+        var textEditor: vscode.TextEditor = vscode.window.activeTextEditor;
         if (!textEditor) {
             return
         }
@@ -77,28 +51,29 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
             if (args.length > 0 && typeof (args[0]) == 'number') {
                 line = textEditor.document.lineAt(args[0])
             }
-            var text = line.text;
+            var text: string = line.text
 
             if (text.startsWith(this.startsWith)) {
                 text = text.replace(this.startsWith, "")
-                text = this.secretLensFunction.decrypt(text)
+                var decrypted = this.secretLensFunction.decrypt(text).toString()
                 textEditor.edit(edits => {
-                    edits.replace(line.range, text)
+                    edits.replace(line.range, decrypted)
                 })
             } else if (!text.startsWith(this.startsWith) && text.length > 0) {
-                text = this.startsWith + this.secretLensFunction.encrypt(text);
-                textEditor.edit(edits => {
-                    edits.replace(line.range, text)
+                this.secretLensFunction.encrypt(text).then((encrypted) => {
+                    textEditor.edit(edits => {
+                        text = this.startsWith + encrypted
+                        edits.replace(line.range, text)
+                    })
                 })
             }
-
-        });
+        })
     }
 
     dispose() {
         if (this.disposables) {
-            this.disposables.forEach(item => item.dispose());
-            this.disposables = null;
+            this.disposables.forEach(item => item.dispose())
+            this.disposables = null
         }
     }
 
