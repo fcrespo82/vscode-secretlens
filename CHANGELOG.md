@@ -2,6 +2,8 @@
 
 ### 1.1.0
 
+- Added crypto api as the default implementation 
+- Added ask for a password for encryption/decryption
 - Changed the default keymaps (old ones were conflicting with save)
 - Changed the custom code
 - Updated the code snippet to reflect above change

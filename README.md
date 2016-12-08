@@ -47,7 +47,5 @@ None
 
 ## Roadmap
 
-- [ ] Use crypto api as the default implementation 
-- [ ] Ask for a password for encryption/decryption
 - [ ] Better tests
-- [ ] Added a TypeScript snippet but it must be converted to JS prior to use
+- [ ] Added a TypeScript snippet but it must be converted to JS prior to use?
