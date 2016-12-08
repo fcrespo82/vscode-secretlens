@@ -42,11 +42,15 @@
         "keybindings": [
             {
                 "command": "secretlens.encrypt",
-                "key": "ctrl+s ctrl+e"
+                "key": "ctrl+l ctrl+e"
             },
             {
                 "command": "secretlens.decrypt",
-                "key": "ctrl+s ctrl+d"
+                "key": "ctrl+l ctrl+d"
+            },
+            {
+                "command": "secretlens.setPassword",
+                "key": "ctrl+l ctrl+p"
             }
         ],
         "snippets": [
@@ -58,11 +62,6 @@
         "configuration": {
             "title": "Configuration for Secret extension",
             "properties": {
-                "secretlens.secretFunctionFilePath": {
-                    "title": "File path for file with custom function",
-                    "description": "File path for file with custom function for SecretLens to apply to your text, it should follow the spec in README",
-                    "type": "string"
-                },
                 "secretlens.startsWith": {
                     "title": "Text for the extension to act upon line",
                     "description": "Text for extension to act upon line",
@@ -76,6 +75,24 @@
                     "default": [
                         "*"
                     ]
+                },
+                "secretlens.customSecretFunction": {
+                    "title": "Custom Secret Function",
+                    "description": "Custom Secret Function",
+                    "type": "object",
+                    "default": {
+                        "shouldAskForPassword": true
+                    },
+                    "properties": {
+                        "shouldAskForPassword": {
+                            "description": "Should the extension ask for a password",
+                            "type": "boolean"
+                        },
+                        "filePath": {
+                            "description": "Path to the file",
+                            "type": "string"
+                        }
+                    }
                 }
             }
         }

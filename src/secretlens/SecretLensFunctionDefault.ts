@@ -5,7 +5,7 @@ import * as vscode from 'vscode'
 export class SecretLensFunctionDefault implements interfaces.ISecretLensFunction {
 
     public password: string;
-    public hasPassword: boolean = true;
+    public shouldAskForPassword: boolean;
 
     private rot47(text) {
         var s = [];
@@ -21,9 +21,6 @@ export class SecretLensFunctionDefault implements interfaces.ISecretLensFunction
     }
 
     encrypt(inputText: string): string {
-        if (!this.password) {
-            vscode.commands.executeCommand('secretlens.setpassword');
-        }
         const cipher = crypto.createCipher('aes256', this.password);
         var encrypted = cipher.update(inputText, 'utf8', 'hex');
         encrypted += cipher.final('hex');
@@ -31,9 +28,6 @@ export class SecretLensFunctionDefault implements interfaces.ISecretLensFunction
     }
 
     decrypt(inputText: string): string {
-        if (!this.password) {
-            vscode.commands.executeCommand('secretlens.setpassword');
-        }
         const decipher = crypto.createDecipher('aes256', this.password);
         var decrypted = decipher.update(inputText, 'hex', 'utf8');
         decrypted += decipher.final('utf8');
