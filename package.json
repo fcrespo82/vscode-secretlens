@@ -24,8 +24,7 @@
     },
     "categories": [
         "Other",
-        "Snippets",
-        "Productivity"
+        "Snippets"
     ],
     "activationEvents": [
         "*"
