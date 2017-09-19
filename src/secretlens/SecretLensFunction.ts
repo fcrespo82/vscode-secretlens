@@ -2,7 +2,7 @@ import * as interfaces from './interfaces'
 import * as crypto from 'crypto'
 import * as vscode from 'vscode'
 
-export class SecretLensFunctionDefault implements interfaces.ISecretLensFunction {
+export class SecretLensFunction implements interfaces.ISecretLensFunction {
 
     public password: string
     public shouldAskForPassword: boolean
@@ -12,34 +12,22 @@ export class SecretLensFunctionDefault implements interfaces.ISecretLensFunction
         this.shouldAskForPassword = true
     }
 
-    encrypt(inputText: string): Thenable<string> {
-        return this.setPassword().then((password) => {
-            this.password = password;
-            var salt = crypto.randomBytes(16).toString('hex')
+    encrypt(inputText: string): string {
+            var salt = crypto.randomBytes(this.saltSize).toString('hex')
             const cipher = crypto.createCipher('aes256', salt + this.password);
             var encrypted = cipher.update(inputText, 'utf8', 'hex');
             encrypted += cipher.final('hex');
             return salt + encrypted;
-        });
     }
 
-    decrypt(inputText: string): Thenable<string> | string {
-        var salt = inputText.substring(0, 16 * 2)
+    decrypt(inputText: string): string {
+        var salt = inputText.substring(0, this.saltSize * 2)
         inputText = inputText.replace(salt, "")
-        if (this.password === undefined || this.password === null || this.password === "") {
-            return this.setPassword().then((password) => {
-                this.password = password;
-                const decipher = crypto.createDecipher('aes256', salt + this.password);
-                var decrypted = decipher.update(inputText, 'hex', 'utf8');
-                decrypted += decipher.final('utf8');
-                return decrypted;
-            });
-        } else {
-            const decipher = crypto.createDecipher('aes256', salt + this.password);
-            var decrypted = decipher.update(inputText, 'hex', 'utf8');
-            decrypted += decipher.final('utf8');
-            return decrypted;
-        }
+        const decipher = crypto.createDecipher('aes256', salt + this.password);
+        var decrypted = decipher.update(inputText, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        return decrypted;
+        
     }
 
     setPassword(): Thenable<string> {
@@ -50,7 +38,7 @@ export class SecretLensFunctionDefault implements interfaces.ISecretLensFunction
                 validateInput: this.validatePassword
             }).then(function(password) {
                 return password
-            });
+            })
         } else {
             return Promise.resolve(this.password)
         }

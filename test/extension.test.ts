@@ -10,13 +10,13 @@ import * as assert from 'assert';
 // as well as import your extension to test it
 import * as vscode from 'vscode';
 import * as myExtension from '../src/extension';
-import { SecretLensFunctionDefault, ISecretLensFunction } from '../src/secretlens';
+import { SecretLensFunction, ISecretLensFunction } from '../src/secretlens';
 
 // Defines a Mocha test suite to group tests of similar kind together
 describe("secretlens", () => {
     var cypher: ISecretLensFunction;
     before(() => {
-        cypher = new SecretLensFunctionDefault();
+        cypher = new SecretLensFunction();
         cypher.shouldAskForPassword = false
         cypher.password = "teste"
     });

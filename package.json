@@ -58,7 +58,7 @@
             }
         ],
         "configuration": {
-            "title": "Configuration for Secret extension",
+            "title": "Configuration for SecretLens extension",
             "properties": {
                 "secretlens.startsWith": {
                     "title": "Text for the extension to act upon line",
@@ -73,11 +73,6 @@
                     "default": [
                         "*"
                     ]
-                },
-                "secretlens.customSecretFunctionFilePath": {
-                    "title": "Custom Secret Function file path",
-                    "description": "Custom Secret Function file path",
-                    "type": "string"
                 }
             }
         }

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { SecretLensFunctionDefault } from './SecretLensFunctionDefault';
+import { SecretLensFunction } from './SecretLensFunction';
 import * as interfaces from './interfaces';
 /**
  * SecretLensProvider
@@ -8,7 +8,7 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
     private disposables: vscode.Disposable[] = [];
     private startsWith: string;
-    private secretLensFunction: interfaces.ISecretLensFunction;
+    private secretLensFunction: SecretLensFunction;
     private codeLenses: vscode.CodeLens[];
 
     constructor() {
@@ -16,11 +16,11 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
         var customSecretFunctionFilePath: any = vscode.workspace.getConfiguration("secretlens").get<any>('customSecretFunctionFilePath');
 
-        this.secretLensFunction = new SecretLensFunctionDefault()
+        this.secretLensFunction = new SecretLensFunction()
 
-        if (customSecretFunctionFilePath) {
-            this.secretLensFunction = require(customSecretFunctionFilePath).customSecretFunction();
-        }
+        // if (customSecretFunctionFilePath) {
+        //     this.secretLensFunction = require(customSecretFunctionFilePath).customSecretFunction();
+        // }
 
     }
 
@@ -29,9 +29,71 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
         this.disposables.push(vscode.languages.registerCodeLensProvider(languages, this));
 
-        this.disposables.push(vscode.commands.registerCommand('secretlens.encrypt', this.execute, this));
+        this.disposables.push(vscode.commands.registerCommand('secretlens.encrypt', this.encrypt, this));
 
-        this.disposables.push(vscode.commands.registerCommand('secretlens.decrypt', this.execute, this));
+        this.disposables.push(vscode.commands.registerCommand('secretlens.decrypt', this.decrypt, this));
+
+    }
+
+    encrypt(): void {
+
+        this.secretLensFunction.setPassword().then((password)=>{
+            this.secretLensFunction.password = password
+
+            var textEditor: vscode.TextEditor = vscode.window.activeTextEditor
+            if (!textEditor) {
+                return
+            }
+
+            var edits = new Array()
+    
+            textEditor.edit(edits => {
+                textEditor.selections.forEach(selection => {
+                    if (selection.isEmpty) {
+                        var range = textEditor.document.lineAt(selection.anchor.line).range
+                        selection = new vscode.Selection(range.start, range.end)
+                    }
+                    var text = textEditor.document.getText(selection)
+                    
+                    if (!text.startsWith(this.startsWith) && text.length > 0) {
+                        var encrypted = this.secretLensFunction.encrypt(text);                            
+                            text = this.startsWith + encrypted
+                            edits.replace(selection, text)
+                        }
+                })
+            })
+        })
+    }
+
+    decrypt(): void {
+
+        this.secretLensFunction.setPassword().then((password)=>{
+            this.secretLensFunction.password = password
+
+            var textEditor: vscode.TextEditor = vscode.window.activeTextEditor
+            if (!textEditor) {
+                return
+            }
+
+            var edits = new Array()
+    
+            textEditor.edit(edits => {
+                textEditor.selections.forEach(selection => {
+                    if (selection.isEmpty) {
+                        var range = textEditor.document.lineAt(selection.anchor.line).range
+                        selection = new vscode.Selection(range.start, range.end)
+                    }
+
+                    var text = textEditor.document.getText(selection)
+                    
+                    if (text.startsWith(this.startsWith)) {
+                        text = text.replace(this.startsWith, "")
+                        var decrypted = this.secretLensFunction.decrypt(text);                            
+                            edits.replace(selection, decrypted)
+                        }
+                })
+            })
+        })
 
     }
 
@@ -40,34 +102,40 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
         if (!textEditor) {
             return
         }
+        
+        // this.secretLensFunction.encrypt("teste")
 
-        textEditor.selections.forEach(selection => {
-            if (!selection.isSingleLine) {
-                vscode.window.showWarningMessage("The extension can only be executed in single line selections")
-                return
-            }
-            var line = textEditor.document.lineAt(selection.start.line)
+        // textEditor.selections.forEach(selection => {
+        //     //if (!selection.isSingleLine) {
+        //         //vscode.window.showWarningMessage("The extension can only be executed in single line selections")
+        //         //return
+        //     //}
+            
+        //     var text = textEditor.document.getText(selection)
 
-            if (args.length > 0 && typeof (args[0]) == 'number') {
-                line = textEditor.document.lineAt(args[0])
-            }
-            var text: string = line.text
+        //     var line = textEditor.document.lineAt(selection.start.line)
 
-            if (text.startsWith(this.startsWith)) {
-                text = text.replace(this.startsWith, "")
-                var decrypted = this.secretLensFunction.decrypt(text).toString()
-                textEditor.edit(edits => {
-                    edits.replace(line.range, decrypted)
-                })
-            } else if (!text.startsWith(this.startsWith) && text.length > 0) {
-                this.secretLensFunction.encrypt(text).then((encrypted) => {
-                    textEditor.edit(edits => {
-                        text = this.startsWith + encrypted
-                        edits.replace(line.range, text)
-                    })
-                })
-            }
-        })
+        //     // if (args.length > 0 && typeof (args[0]) == 'number') {
+        //     //     line = textEditor.document.lineAt(args[0])
+        //     // }
+        //     // var text: string = line.text
+
+        //     if (text.startsWith(this.startsWith)) {
+        //         text = text.replace(this.startsWith, "")
+        //         this.secretLensFunction.decrypt(text).then((decrypted) => {
+        //             textEditor.edit(edits => {
+        //                 edits.replace(selection, decrypted)
+        //             })
+        //         })
+        //     } else if (!text.startsWith(this.startsWith) && text.length > 0) {
+        //         this.secretLensFunction.encrypt(text).then((encrypted) => {
+        //             textEditor.edit(edits => {
+        //                 text = this.startsWith + encrypted
+        //                 edits.replace(selection, text)
+        //             })
+        //         })
+        //     }
+        // })
     }
 
     dispose() {
@@ -108,8 +176,7 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
         codeLens.command = {
             title: this.startsWith + this.secretLensFunction.decrypt(text.replace(this.startsWith, "")),
-            command: 'secretlens.decrypt',
-            arguments: [codeLens.range.start.line]
+            command: 'secretlens.decrypt'
         }
 
         return codeLens;
