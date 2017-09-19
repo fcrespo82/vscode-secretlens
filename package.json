@@ -39,6 +39,10 @@
             {
                 "title": "SecretLens: Decrypt",
                 "command": "secretlens.decrypt"
+            },
+            {
+                "title": "SecretLens: Set password",
+                "command": "secretlens.setPassword"
             }
         ],
         "keybindings": [
@@ -49,12 +53,10 @@
             {
                 "command": "secretlens.decrypt",
                 "key": "ctrl+l ctrl+d"
-            }
-        ],
-        "snippets": [
+            },
             {
-                "language": "javascript",
-                "path": "./snippets/javascript.json"
+                "command": "secretlens.setPassword",
+                "key": "ctrl+l ctrl+p"
             }
         ],
         "configuration": {

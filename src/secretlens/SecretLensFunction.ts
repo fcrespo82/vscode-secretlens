@@ -4,44 +4,67 @@ import * as vscode from 'vscode'
 
 export class SecretLensFunction implements interfaces.ISecretLensFunction {
 
-    public password: string
-    public shouldAskForPassword: boolean
+    private password: string
+    shouldAskForPassword: boolean = true
     private saltSize: number = 16
-
-    constructor() {
-        this.shouldAskForPassword = true
-    }
+    private useSalt: boolean = true
 
     encrypt(inputText: string): string {
+        var encrypted: string = ""
+
+        var saltedPassword = this.password
+        if (this.useSalt) {
             var salt = crypto.randomBytes(this.saltSize).toString('hex')
-            const cipher = crypto.createCipher('aes256', salt + this.password);
-            var encrypted = cipher.update(inputText, 'utf8', 'hex');
-            encrypted += cipher.final('hex');
-            return salt + encrypted;
+            saltedPassword = salt + this.password
+        }
+        const cipher = crypto.createCipher('aes256', saltedPassword)
+        
+        encrypted = cipher.update(inputText, 'utf8', 'hex')
+        encrypted += cipher.final('hex')
+        if (this.useSalt) {
+            return salt + encrypted
+        } else {
+            return encrypted
+        }
+
     }
 
     decrypt(inputText: string): string {
-        var salt = inputText.substring(0, this.saltSize * 2)
-        inputText = inputText.replace(salt, "")
-        const decipher = crypto.createDecipher('aes256', salt + this.password);
-        var decrypted = decipher.update(inputText, 'hex', 'utf8');
-        decrypted += decipher.final('utf8');
-        return decrypted;
-        
+        var decrypted: string = ""
+        var ended = false
+        var saltedPassword = this.password        
+        if (this.useSalt) {
+            var salt = inputText.substring(0, this.saltSize * 2)
+            inputText = inputText.replace(salt, "")
+            saltedPassword = salt + this.password
+        }            
+        const decipher = crypto.createDecipher('aes256', saltedPassword)
+        decrypted = decipher.update(inputText, 'hex', 'utf8')
+        decrypted += decipher.final('utf8')
+        ended = true
+        return decrypted
     }
 
-    setPassword(): Thenable<string> {
-        if (this.shouldAskForPassword && (this.password === undefined || this.password === null || this.password === "")) {
+    setUseSalt(useSalt: boolean) {
+        this.useSalt = useSalt
+    }
+
+    setPassword(password: string): void {
+        this.password = password
+        this.shouldAskForPassword = false
+    }
+
+    askPassword(): Thenable<void>  {
+        if (this.shouldAskForPassword) {
             var self = this;
             return vscode.window.showInputBox({
                 password: true, prompt: "What's the password to encrypt/decrypt this message?", placeHolder: "password", ignoreFocusOut: true,
                 validateInput: this.validatePassword
             }).then(function(password) {
-                return password
+                self.setPassword(password)
             })
-        } else {
-            return Promise.resolve(this.password)
         }
+        return Promise.resolve()
     }
 
     private validatePassword(password: string): string {

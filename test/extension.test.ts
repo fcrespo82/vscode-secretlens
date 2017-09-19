@@ -10,26 +10,42 @@ import * as assert from 'assert';
 // as well as import your extension to test it
 import * as vscode from 'vscode';
 import * as myExtension from '../src/extension';
-import { SecretLensFunction, ISecretLensFunction } from '../src/secretlens';
+import { SecretLensProvider } from '../src/secretlens';
 
 // Defines a Mocha test suite to group tests of similar kind together
 describe("secretlens", () => {
-    var cypher: ISecretLensFunction;
+    var provider: SecretLensProvider
     before(() => {
-        cypher = new SecretLensFunction();
-        cypher.shouldAskForPassword = false
-        cypher.password = "teste"
+        provider = new SecretLensProvider();
+        
+        provider.getFunction().setPassword("test")
+
     });
 
     context("encrypt", () => {
         it("should encrypt correctly", () => {
-            assert.equal(cypher.encrypt('test'), '46800f525d58bb6a3886d37a247bd4db');
+            provider.getFunction().setUseSalt(false)
+            var tests = [{
+                text:'test',
+                encrypted:'cc1fbd73cb93106c3358636ff619bdbd'
+            }]
+            tests.forEach(test => {
+                assert.equal(provider.getFunction().encrypt(test.text), test.encrypted)
+            });
         });
     });
     context("decrypt", () => {
         it("should decrypt correctly", () => {
-            assert.equal(cypher.decrypt('46800f525d58bb6a3886d37a247bd4db'), 'test');
-
+            provider.getFunction().setUseSalt(true)            
+            var tests = [
+                {
+                    text:'test',
+                    encrypted:'5ea71fb5236204d32cdb40b90501f7812b545f2e9ed21de69075e0f89fd62855'
+                }
+            ]
+            tests.forEach(test => {
+                assert.equal(provider.getFunction().decrypt(test.encrypted), test.text)
+            });
         });
     });
 });
