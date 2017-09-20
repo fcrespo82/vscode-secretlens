@@ -3,6 +3,7 @@
 ### 1.2.0
 
 - Support for multi line and multi selection
+- Removed support for custom code and snippet as crypto-js implementation is already secure
 
 ### 1.1.0
 
