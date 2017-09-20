@@ -17,7 +17,7 @@ It has two commands:
 This extension has the following settings:
 
 * `secretlens.startsWith`: Text for the extension to act upon line
-* `secretlens.languages`: Languages in wich SecretLens will run. Defaults to ALL
+* `secretlens.languages`: Languages in which SecretLens will run. Defaults to ALL
 
 ## Known Issues
 
