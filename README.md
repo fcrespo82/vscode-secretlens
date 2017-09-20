@@ -17,35 +17,8 @@ It has two commands:
 This extension has the following settings:
 
 * `secretlens.startsWith`: Text for the extension to act upon line
-* `secretlens.customSecretFunctionFilePath`: File path for file with custom function for SecretLens to apply to your text. [Default: undefined]
-
-### For use with a custom file (`customSecretFunctionFilePath` setting)
-
-The file contents should follow the following spec. The extension provide a code snippet (`slfunction`) to help the creation of that file.
-
-It should have a `encrypt` and a `decrypt` function with your custom code in it.
-
-```javascript
-"use strict";
-var SecretLensFunction = (function () {
-    function SecretLensFunction() {
-    }
-    SecretLensFunction.prototype.encrypt = function (inputText) {
-        return "#" + inputText + "#";
-    };
-    SecretLensFunction.prototype.decrypt = function (inputText) {
-        return inputText.substring(1, inputText.length - 1);
-    };
-    return SecretLensFunction;
-}());
-exports.customSecretFunction = SecretLensFunction;
-``` 
+* `secretlens.languages`: Languages in wich SecretLens will run. Defaults to ALL
 
 ## Known Issues
 
 None
-
-## Roadmap
-
-- [ ] Better tests
-- [ ] Added a TypeScript snippet but it must be converted to JS prior to use?

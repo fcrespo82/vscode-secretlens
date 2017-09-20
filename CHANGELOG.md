@@ -1,5 +1,9 @@
 ## Changelog
 
+### 1.2.0
+
+- Support for multi line and multi selection
+
 ### 1.1.0
 
 - Added crypto api as the default implementation 
