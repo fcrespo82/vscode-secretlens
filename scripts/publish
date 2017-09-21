@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+vsce publish $1
+vsce package -o ./vsix_packages
