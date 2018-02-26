@@ -1,5 +1,9 @@
 ## Changelog
 
+### 1.3.0
+
+- [NEW] Support for copying secret directly (default keybinding: <kbd>ctrl</kbd>+<kbd>l</kbd> <kbd>ctrl</kbd>+<kbd>c</kbd>)
+
 ### 1.2.0
 
 - Support for multi line and multi selection
