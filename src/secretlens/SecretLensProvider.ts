@@ -1,6 +1,7 @@
-import * as vscode from 'vscode';
 import { SecretLensFunction } from './SecretLensFunction';
 import * as interfaces from './interfaces';
+import * as copyPaste from "copy-paste"
+import * as vscode from "vscode";
 /**
  * SecretLensProvider
  */
@@ -30,6 +31,29 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
         this.disposables.push(vscode.commands.registerCommand('secretlens.setPassword', this.setPassword, this))
 
+        this.disposables.push(vscode.commands.registerTextEditorCommand('secretlens.copySecret', this.copySecret, this))
+
+    }
+
+    copySecret(editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
+        let selection = editor.selection
+        var range = new vscode.Range(selection.start, selection.end);
+        if (selection.isEmpty) {
+             range = editor.document.lineAt(selection.anchor.line).range
+        }
+        var text = editor.document.getText(range)
+        if (text.startsWith(this.startsWith)) {
+            if (editor.selections.length > 1) {
+                vscode.window.showErrorMessage("Can only copy one secret")
+            } else {
+                text = text.replace(this.startsWith, "")
+                var decrypted = this.secretLensFunction.decrypt(text);
+                copyPaste.copy(decrypted, (e) => {
+                    console.log(e);
+                });
+            }
+
+        }
     }
 
     getFunction(): SecretLensFunction {
@@ -41,27 +65,24 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
     }
 
     encrypt(): void {
-
         var textEditor: vscode.TextEditor = vscode.window.activeTextEditor
         if (!textEditor) {
             return
         }
-
         this.setPassword().then(() => {
-            var edits = new Array()
-
             textEditor.edit((edits) => {
                 textEditor.selections.forEach(selection => {
-                    if (selection.isEmpty) {
-                        var range = textEditor.document.lineAt(selection.anchor.line).range
-                        selection = new vscode.Selection(range.start, range.end)
+                    let mySel = selection
+                    var range = new vscode.Range(selection.start, selection.end);
+                    if (mySel.isEmpty) {
+                        range = textEditor.document.lineAt(mySel.start.line).range
                     }
-                    var text = textEditor.document.getText(selection)
+                    var text = textEditor.document.getText(range)
 
                     if (!text.startsWith(this.startsWith) && text.length > 0) {
                         var encrypted = this.secretLensFunction.encrypt(text)
                         text = this.startsWith + encrypted
-                        edits.replace(selection, text)
+                        edits.replace(range, text)
                     }
                 })
             })
@@ -69,28 +90,26 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
     }
 
     decrypt(): void {
-        
+
         var textEditor: vscode.TextEditor = vscode.window.activeTextEditor
         if (!textEditor) {
             return
         }
 
         this.setPassword().then(() => {
-            var edits = new Array()
-
             textEditor.edit(edits => {
                 textEditor.selections.forEach(selection => {
-                    if (selection.isEmpty) {
-                        var range = textEditor.document.lineAt(selection.anchor.line).range
-                        selection = new vscode.Selection(range.start, range.end)
+                    let mySel = selection
+                    var range = new vscode.Range(selection.start, selection.end);
+                    if (mySel.isEmpty) {
+                        range = textEditor.document.lineAt(mySel.start.line).range
                     }
-
-                    var text = textEditor.document.getText(selection)
+                    var text = textEditor.document.getText(range)
 
                     if (text.startsWith(this.startsWith)) {
                         text = text.replace(this.startsWith, "")
                         var decrypted = this.secretLensFunction.decrypt(text);
-                        edits.replace(selection, decrypted)
+                        edits.replace(range, decrypted)
                     }
                 })
             })
