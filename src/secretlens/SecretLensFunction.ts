@@ -3,22 +3,19 @@ import * as crypto from 'crypto'
 import * as vscode from 'vscode'
 
 export class SecretLensFunction implements interfaces.ISecretLensFunction {
-
     private password: string
-    shouldAskForPassword: boolean = true
+    public shouldAskForPassword: boolean = true
     private saltSize: number = 16
     private useSalt: boolean = true
 
-    encrypt(inputText: string): string {
+    public encrypt(inputText: string): string {
         var encrypted: string = ""
-
         var saltedPassword = this.password
         if (this.useSalt) {
             var salt = crypto.randomBytes(this.saltSize).toString('hex')
             saltedPassword = salt + this.password
         }
         const cipher = crypto.createCipher('aes256', saltedPassword)
-        
         encrypted = cipher.update(inputText, 'utf8', 'hex')
         encrypted += cipher.final('hex')
         if (this.useSalt) {
@@ -26,10 +23,9 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
         } else {
             return encrypted
         }
-
     }
 
-    decrypt(inputText: string): string {
+    public decrypt(inputText: string): string {
         var decrypted: string = ""
         var ended = false
         var saltedPassword = this.password        
@@ -45,16 +41,16 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
         return decrypted
     }
 
-    setUseSalt(useSalt: boolean) {
+    public setUseSalt(useSalt: boolean) {
         this.useSalt = useSalt
     }
 
-    setPassword(password: string): void {
+    public setPassword(password: string): void {
         this.password = password
         this.shouldAskForPassword = false
     }
 
-    askPassword(): Thenable<void>  {
+    public askPassword(): Thenable<void>  {
         if (this.shouldAskForPassword) {
             var self = this;
             return vscode.window.showInputBox({
