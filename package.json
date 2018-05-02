@@ -5,8 +5,8 @@
     "version": "1.3.0",
     "icon": "resources/icon.png",
     "galleryBanner": {
-		"theme": "dark"
-	},
+        "theme": "dark"
+    },
     "publisher": "fcrespo82",
     "homepage": "https://github.com/fcrespo82/vscode-secretlens",
     "repository": {
@@ -98,11 +98,11 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.6",
+        "@types/mocha": "^2.2.32",
+        "@types/node": "^6.0.107",
         "mocha": "^2.3.3",
-        "@types/node": "^6.0.40",
-        "@types/mocha": "^2.2.32"
+        "typescript": "^2.8.3",
+        "vscode": "^1.1.17"
     },
     "dependencies": {
         "clipboardy": "^1.2.3"
