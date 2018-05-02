@@ -3,6 +3,10 @@
     "displayName": "SecretLens",
     "description": "Show a codelens decrypting a secret in the document",
     "version": "1.3.0",
+    "icon": "resources/icon.png",
+    "galleryBanner": {
+		"theme": "dark"
+	},
     "publisher": "fcrespo82",
     "homepage": "https://github.com/fcrespo82/vscode-secretlens",
     "repository": {
