@@ -27,17 +27,24 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
 
     public decrypt(inputText: string): string {
         var decrypted: string = ""
-        var ended = false
-        var saltedPassword = this.password        
-        if (this.useSalt) {
-            var salt = inputText.substring(0, this.saltSize * 2)
-            inputText = inputText.replace(salt, "")
-            saltedPassword = salt + this.password
-        }            
-        const decipher = crypto.createDecipher('aes256', saltedPassword)
-        decrypted = decipher.update(inputText, 'hex', 'utf8')
-        decrypted += decipher.final('utf8')
-        ended = true
+        try {
+            var ended = false
+            if (!this.password) {
+                return "Please set the password."
+            }
+            var saltedPassword = this.password
+            if (this.useSalt) {
+                var salt = inputText.substring(0, this.saltSize * 2)
+                inputText = inputText.replace(salt, "")
+                saltedPassword = salt + this.password
+            }
+            const decipher = crypto.createDecipher('aes256', saltedPassword)
+            decrypted = decipher.update(inputText, 'hex', 'utf8')
+            decrypted += decipher.final('utf8')
+            ended = true
+        } catch (error) {
+            return "Error decrypting the message (make sure the password is correct)"
+        }
         return decrypted
     }
 
@@ -50,13 +57,13 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
         this.shouldAskForPassword = false
     }
 
-    public askPassword(): Thenable<void>  {
+    public askPassword(): Thenable<void> {
         if (this.shouldAskForPassword) {
             var self = this;
             return vscode.window.showInputBox({
                 password: true, prompt: "What's the password to encrypt/decrypt this message?", placeHolder: "password", ignoreFocusOut: true,
                 validateInput: this.validatePassword
-            }).then(function(password) {
+            }).then(function (password) {
                 self.setPassword(password)
             })
         }
@@ -65,10 +72,10 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
 
     private validatePassword(password: string): string {
         if (password === undefined || password === null || password === "") {
-            return "You should provide a password";
+            return "You must provide a password";
         }
         if (password.length <= 4) {
-            return "The password should have at least 5 characters";
+            return "The password must have at least 5 characters";
         }
         return undefined
     }
