@@ -70,6 +70,17 @@
         "configuration": {
             "title": "Configuration for SecretLens extension",
             "properties": {
+                "secretlens.displayType": {
+                    "title": "How to display the secret",
+                    "description": "Display the secret as a inline CodeLens, a Hover Provider or Both.\nThe extensions must be reloaded to this setting take effect.",
+                    "type": "string",
+                    "enum": [
+                        "CodeLens",
+                        "Hover",
+                        "Both"
+                    ],
+                    "default": "CodeLens"
+                },
                 "secretlens.startsWith": {
                     "title": "Text for the extension to act upon line",
                     "description": "Text for extension to act upon line",
@@ -95,6 +106,7 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
+        "@types/clipboardy": "^1.1.0",
         "@types/mocha": "^2.2.32",
         "@types/node": "^6.0.108",
         "mocha": "^2.3.3",
