@@ -65,15 +65,14 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
         }).then(function (password) {
             self.setPassword(password)
         })
-        return Promise.resolve()
     }
 
     private validatePassword(password: string): string {
         if (password === undefined || password === null || password === "") {
-            return "You should provide a password";
+            return "You must provide a password";
         }
         if (password.length <= 4) {
-            return "The password should have at least 5 characters";
+            return "The password must have at least 5 characters";
         }
         return undefined
     }

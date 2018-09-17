@@ -17,8 +17,8 @@ describe("secretlens", () => {
     var provider: SecretLensProvider
     before(() => {
         provider = new SecretLensProvider();
-        
-        provider.getFunction().setPassword("test")
+
+        provider.getFunction().setPassword("teste")
 
     });
 
@@ -26,8 +26,8 @@ describe("secretlens", () => {
         it("should encrypt correctly", () => {
             provider.getFunction().setUseSalt(false)
             var tests = [{
-                text:'test',
-                encrypted:'cc1fbd73cb93106c3358636ff619bdbd'
+                text: 'test',
+                encrypted: '46800f525d58bb6a3886d37a247bd4db'
             }]
             tests.forEach(test => {
                 assert.equal(provider.getFunction().encrypt(test.text), test.encrypted)
@@ -36,11 +36,11 @@ describe("secretlens", () => {
     });
     context("decrypt", () => {
         it("should decrypt correctly", () => {
-            provider.getFunction().setUseSalt(true)            
+            provider.getFunction().setUseSalt(true)
             var tests = [
                 {
-                    text:'test',
-                    encrypted:'5ea71fb5236204d32cdb40b90501f7812b545f2e9ed21de69075e0f89fd62855'
+                    text: 'test',
+                    encrypted: '7cdfda208c21275a6188573a4f2476e6c2e89f9579107a813ab8defab1f69956'
                 }
             ]
             tests.forEach(test => {
