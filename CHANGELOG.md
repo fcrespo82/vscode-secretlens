@@ -1,9 +1,18 @@
 ## Changelog
 
+### 1.5.0
+
+- [NEW] Now it's possible to have multiple secrets on the same line  
+  The secret will be encrypted/decrypted/copyed inplace respecting its boundaries
+- [NEW] Configuration for separator when copying multiple secret copy
+- [CHANGE] Removed limitation of multiple secret copy
+- [CHANGE] Changed Mac keybinding to <kbd>cmd</kbd> for consistency with the platform
+- [FIX] More consistency in asking for a password, showing lens warning for bad password
+
 ### 1.4.0
 
 - [NEW] Support for displaying the secret as CodeLens or Hover (defaults to CodeLens)
-- [CHANGED] The click command on CodeLens now copy the secret
+- [CHANGE] The click command on CodeLens now copy the secret
 - [FIX] Ask for the password if the user tries to copy the secret
 
 ### 1.3.0
@@ -19,9 +28,9 @@
 
 - [NEW] Crypto api as the default implementation 
 - [NEW] Ask for a password for encryption/decryption
-- [CHANGED] The default keymaps (old ones were conflicting with save)
-- [CHANGED] The custom code
-- [CHANGED] The code snippet to reflect above change
+- [CHANGE] The default keymaps (old ones were conflicting with save)
+- [CHANGE] The custom code
+- [CHANGE] The code snippet to reflect above change
 
 ### 1.0.2
 
