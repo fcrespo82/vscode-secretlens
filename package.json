@@ -52,19 +52,23 @@
         "keybindings": [
             {
                 "command": "secretlens.encrypt",
-                "key": "ctrl+l ctrl+e"
+                "key": "ctrl+l ctrl+e",
+                "mac": "cmd+l cmd+e"
             },
             {
                 "command": "secretlens.decrypt",
-                "key": "ctrl+l ctrl+d"
+                "key": "ctrl+l ctrl+d",
+                "mac": "cmd+l cmd+d"
             },
             {
                 "command": "secretlens.setPassword",
-                "key": "ctrl+l ctrl+p"
+                "key": "ctrl+l ctrl+p",
+                "mac": "cmd+l cmd+p"
             },
             {
                 "command": "secretlens.copySecret",
-                "key": "ctrl+l ctrl+c"
+                "key": "ctrl+l ctrl+c",
+                "mac": "cmd+l cmd+c"
             }
         ],
         "configuration": {
