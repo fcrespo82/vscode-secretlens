@@ -21,7 +21,7 @@
         "decrypt"
     ],
     "engines": {
-        "vscode": "^1.20.0"
+        "vscode": "^1.22.0"
     },
     "categories": [
         "Other"
@@ -99,7 +99,7 @@
         "@types/node": "^6.0.108",
         "mocha": "^2.3.3",
         "typescript": "^2.8.3",
-        "vscode": "^1.1.17"
+        "vscode": "^1.1.21"
     },
     "dependencies": {
         "clipboardy": "^1.2.3"

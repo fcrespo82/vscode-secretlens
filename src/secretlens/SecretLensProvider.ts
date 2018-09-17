@@ -10,11 +10,16 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
     private startsWith: string
     private secretLensFunction: SecretLensFunction
     private codeLenses: vscode.CodeLens[]
+    private _onDidChangeCodeLenses: vscode.EventEmitter<void> = new vscode.EventEmitter<void>()
+    public readonly onDidChangeCodeLenses: vscode.Event<void> = this._onDidChangeCodeLenses.event
 
     constructor() {
         this.startsWith = vscode.workspace.getConfiguration("secretlens").get<string>('startsWith')
-        var customSecretFunctionFilePath: any = vscode.workspace.getConfiguration("secretlens").get<any>('customSecretFunctionFilePath')
-        this.secretLensFunction = new SecretLensFunction()
+        this.secretLensFunction = new SecretLensFunction(this)
+    }
+
+    reload() {
+        this._onDidChangeCodeLenses.fire()
     }
 
     public register() {
@@ -30,7 +35,7 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
         let selection = editor.selection
         var range = new vscode.Range(selection.start, selection.end);
         if (selection.isEmpty) {
-             range = editor.document.lineAt(selection.anchor.line).range
+            range = editor.document.lineAt(selection.anchor.line).range
         }
         var text = editor.document.getText(range)
         if (text.startsWith(this.startsWith)) {
@@ -110,6 +115,7 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
     public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
         var lines: string[] = document.getText().split("\n");
         var mapped: number[] = [];
+        // Find lines with `startswith` string
         mapped = lines.map((line, index) => {
             if (line.startsWith(this.startsWith)) {
                 return index;
@@ -130,9 +136,27 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
     public resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken) {
         var text = vscode.window.activeTextEditor.document.getText(codeLens.range);
-        codeLens.command = {
-            title: this.startsWith + this.secretLensFunction.decrypt(text.replace(this.startsWith, "")),
-            command: 'secretlens.decrypt'
+
+        if (this.secretLensFunction.shouldAskForPassword) {
+            codeLens.command = {
+                title: "Password not set: click here to set",
+                command: 'secretlens.setPassword'
+            }
+        } else {
+            let decrypted: string
+            try {
+                decrypted = this.secretLensFunction.decrypt(text.replace(this.startsWith, ""))
+                codeLens.command = {
+                    title: decrypted,
+                    command: 'secretlens.decrypt'
+                }
+            } catch (error) {
+                codeLens.command = {
+                    title: 'Failed to decrypt the message (the password is correct?)',
+                    command: 'secretlens.setPassword'
+                }
+            }
+
         }
         return codeLens;
     }

@@ -1,12 +1,18 @@
 import * as interfaces from './interfaces'
 import * as crypto from 'crypto'
 import * as vscode from 'vscode'
+import { SecretLensProvider } from './SecretLensProvider';
 
 export class SecretLensFunction implements interfaces.ISecretLensFunction {
     private password: string
     public shouldAskForPassword: boolean = true
     private saltSize: number = 16
     private useSalt: boolean = true
+
+    private provider
+    constructor(provider: SecretLensProvider) {
+        this.provider = provider
+    }
 
     public encrypt(inputText: string): string {
         var encrypted: string = ""
@@ -28,12 +34,12 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
     public decrypt(inputText: string): string {
         var decrypted: string = ""
         var ended = false
-        var saltedPassword = this.password        
+        var saltedPassword = this.password
         if (this.useSalt) {
             var salt = inputText.substring(0, this.saltSize * 2)
             inputText = inputText.replace(salt, "")
             saltedPassword = salt + this.password
-        }            
+        }
         const decipher = crypto.createDecipher('aes256', saltedPassword)
         decrypted = decipher.update(inputText, 'hex', 'utf8')
         decrypted += decipher.final('utf8')
@@ -46,20 +52,19 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
     }
 
     public setPassword(password: string): void {
+        this.provider.reload()
         this.password = password
         this.shouldAskForPassword = false
     }
 
-    public askPassword(): Thenable<void>  {
-        if (this.shouldAskForPassword) {
-            var self = this;
-            return vscode.window.showInputBox({
-                password: true, prompt: "What's the password to encrypt/decrypt this message?", placeHolder: "password", ignoreFocusOut: true,
-                validateInput: this.validatePassword
-            }).then(function(password) {
-                self.setPassword(password)
-            })
-        }
+    public askPassword(): Thenable<void> {
+        var self = this;
+        return vscode.window.showInputBox({
+            password: true, prompt: "What's the password to encrypt/decrypt this message?", placeHolder: "password", ignoreFocusOut: true,
+            validateInput: this.validatePassword
+        }).then(function (password) {
+            self.setPassword(password)
+        })
         return Promise.resolve()
     }
 
