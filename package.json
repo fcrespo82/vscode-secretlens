@@ -86,7 +86,7 @@
             }
         ],
         "configuration": {
-            "title": "Configuration for SecretLens extension",
+            "title": "SecretLens",
             "properties": {
                 "secretlens.displayType": {
                     "title": "How to display the secret",
@@ -99,11 +99,17 @@
                     ],
                     "default": "CodeLens"
                 },
-                "secretlens.startsWith": {
-                    "title": "Text for the extension to act upon line",
-                    "description": "Text for extension to act upon line",
+                "secretlens.token": {
+                    "title": "Token",
+                    "description": "Token for identifying the encrypted text",
                     "type": "string",
-                    "default": "secretlens:"
+                    "default": "secretlens"
+                },
+                "secretlens.excludeEnd": {
+                    "title": "Exclude end fence",
+                    "description": "Should the end fence be excluded when encrypting texts",
+                    "type": "boolean",
+                    "default": false
                 },
                 "secretlens.languages": {
                     "title": "Language identifiers",

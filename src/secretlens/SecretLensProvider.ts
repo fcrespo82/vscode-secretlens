@@ -7,21 +7,38 @@ import * as vscode from 'vscode';
  */
 export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Disposable, vscode.HoverProvider {
 
+    private regex: RegExp
     private disposables: vscode.Disposable[] = []
-    private startsWith: string
     private secretLensFunction: SecretLensFunction
     private codeLenses: vscode.CodeLens[]
     private _onDidChangeCodeLenses: vscode.EventEmitter<void> = new vscode.EventEmitter<void>()
     public readonly onDidChangeCodeLenses: vscode.Event<void> = this._onDidChangeCodeLenses.event
-    private config = vscode.workspace.getConfiguration("secretlens")
+    private config: vscode.WorkspaceConfiguration
 
     constructor() {
-        this.startsWith = this.config.get('startsWith')
+        this.configLoaded()
         this.secretLensFunction = new SecretLensFunction(this)
     }
 
     reload() {
         this._onDidChangeCodeLenses.fire()
+    }
+
+    private configLoaded() {
+        this.config = vscode.workspace.getConfiguration("secretlens")
+        this.regex = new RegExp(`${this.startToken}.+(${this.endToken})?`, "g")
+        this.forgetPassword(true)
+    }
+    private get startToken() {
+        return this.config.get('token') + ":"
+    }
+
+    private get endToken() {
+        return ":" + this.config.get('token')
+    }
+
+    private removeTokens(text: string): string {
+        return text.replace(this.startToken, "").replace(this.endToken, "")
     }
 
     public register() {
@@ -47,8 +64,7 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
         this.disposables.push(vscode.commands.registerTextEditorCommand('secretlens.copySecret', this.copySecret, this))
 
         vscode.workspace.onDidChangeConfiguration((event) => {
-            this.config = vscode.workspace.getConfiguration("secretlens")
-            this.forgetPassword(true)
+            this.configLoaded()
         })
     }
 
@@ -57,11 +73,11 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
             let decrypted = []
             editor.selections.forEach(selection => {
                 let line = vscode.window.activeTextEditor.document.lineAt(selection.start.line)
-                const regex = new RegExp(this.startsWith + '.{64,}?\\b', 'g')
+                const regex = new RegExp(this.regex)
                 let text = line.text
                 let match;
                 while ((match = regex.exec(text)) !== null) {
-                    let text = match[0].replace(this.startsWith, '')
+                    let text = this.removeTokens(match[0])
                     decrypted.push(this.secretLensFunction.decrypt(text))
                 }
             });
@@ -106,22 +122,20 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
             let editor = vscode.window.activeTextEditor
             editor.edit((edits) => {
                 editor.selections.forEach(selection => {
-                    let mySel = selection
                     var range = new vscode.Range(selection.start, selection.end);
-                    if (mySel.isEmpty) {
-                        range = editor.document.lineAt(mySel.start.line).range
+                    if (selection.isEmpty) {
+                        range = editor.document.lineAt(selection.start.line).range
                     }
                     var text = editor.document.getText(range)
 
-                    if (!text.startsWith(this.startsWith) && text.length > 0) {
+                    if (!this.regex.test(text) && text.length > 0) {
                         var encrypted = this.secretLensFunction.encrypt(text)
-                        var text = this.startsWith + encrypted
+                        var text = this.startToken + encrypted + (!this.config.get("excludeEnd") ? this.endToken : "")
                         edits.replace(range, text)
                         replaces.push(new vscode.Selection(range.start, range.start.translate(0, text.length)))
                     }
                 })
             }).then(() => {
-                console.log(replaces)
                 editor.selections = replaces
             })
         })
@@ -134,23 +148,20 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
             editor.edit(edits => {
                 editor.selections.forEach(selection => {
                     let line = editor.document.lineAt(selection.start.line)
-
-                    const regex = new RegExp(this.startsWith + '.{64,}?\\b', 'g')
+                    const regex = new RegExp(this.regex)
                     let text = line.text
                     let match;
                     while ((match = regex.exec(text)) !== null) {
-                        let text = match[0].replace(this.startsWith, '')
+                        let text = this.removeTokens(match[0])
                         let index = line.text.indexOf(match[0])
                         let position = new vscode.Position(line.lineNumber, index)
-                        let range = editor.document.getWordRangeAtPosition(position, new RegExp(this.startsWith + '.{64,}?\\b', 'g'))
+                        let range = editor.document.getWordRangeAtPosition(position, new RegExp(this.regex))
 
                         edits.replace(range, this.secretLensFunction.decrypt(text))
-
                         replaces.push(new vscode.Selection(range.start, range.start.translate(0, this.secretLensFunction.decrypt(text).length)))
                     }
                 })
             }).then(() => {
-                console.log(replaces)
                 editor.selections = replaces
             })
         })
@@ -165,15 +176,14 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
     public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
         this.codeLenses = [];
-        // Need at least 64 chars after `startswith` string to act as a SecretLens
-        const regex = new RegExp(this.startsWith + '.{64,}?\\b', 'g')
+        const regex = new RegExp(this.regex)
         const text = document.getText()
         let matches;
         while ((matches = regex.exec(text)) !== null) {
             let line = document.lineAt(document.positionAt(matches.index).line);
             let indexOf = line.text.indexOf(matches[0])
             let position = new vscode.Position(line.lineNumber, indexOf)
-            let range = document.getWordRangeAtPosition(position, new RegExp(this.startsWith + '.{64,}?\\b', 'g'))
+            let range = document.getWordRangeAtPosition(position, new RegExp(this.regex))
             this.codeLenses.push(new vscode.CodeLens(range));
         }
         return this.codeLenses;
@@ -190,7 +200,7 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
         } else {
             let decrypted: string
             try {
-                decrypted = this.secretLensFunction.decrypt(text.replace(this.startsWith, ""))
+                decrypted = this.secretLensFunction.decrypt(this.removeTokens(text))
                 codeLens.command = {
                     title: decrypted,
                     command: 'secretlens.copySecret'
@@ -207,7 +217,7 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
     provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {
         let line = document.lineAt(position);
-        let text = this.secretLensFunction.decrypt(line.text.replace(this.startsWith, ''));
+        let text = this.secretLensFunction.decrypt(this.removeTokens(line.text));
         return new vscode.Hover(text, line.range)
     }
 }
