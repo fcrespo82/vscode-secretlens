@@ -1,25 +1,36 @@
 # SecretLens README
 
-A CodeLens provider that automatically decrypts a line of text and show as a CodeLens.
+A CodeLens/Hover provider that automatically decrypts identified text and show as a CodeLens/Hover.
 
-## Features
+## What this extension do?
 
-Show a CodeLens with text decrypted from the line.
+Encrypt/decrypt text within the file.
 
-If a line starts with `secretlens:` (config option) then the rest of the line is decrypted by a function (config option) and displayed inline.
+### How?
 
-It has two commands:
-- `encrypt`: Encrypt the current line and puts the `startsWith` text in the begining
-- `decrypt`: Decrypt the current line and removes the `startsWith` text
-- `copy`: Copy the current line decrypted to clipboard
+Encrypting accepts your selection, or hole line if no selection, encrypts it and replaces for the fenced block `${token}:<your text>:${token}` (token is configurable)
+
+Decrypting searchs for the fenced block and then replaces by the plain text. 
+
+The fenced block is the default behavior because of [this limitation](https://github.com/fcrespo82/vscode-secretlens/issues/2).
+If you want to keep the previous behavior set `excludeEnd` option to true
+
+
+## Extension Commands
+
+- **Encrypt**: Encrypt the current line and replaces for `${token}:<encrypted>:${token}`
+- **Decrypt**: Decrypt the current line
+- **Set password**: Set a new password
+- **Forget password**: Forget the current password
+- **Copy secret**: Copy the selected secrets decrypted to clipboard
 
 ## Extension Settings
 
-This extension has the following settings:
-
-* `secretlens.startsWith`: Text for the extension to act upon line
-* `secretlens.languages`: Languages in which SecretLens will run. Defaults to ALL
-
+- **Token**: Token for identifying the encrypted text. Defaults to `secretlens`
+- **Exclude end**: Should include the end fence when encrypting texts. Defaults to false.
+- **Copy separator**: Separator for when copying multiple secrets. Defaults to `\n`
+- **Languages**: Languages in which SecretLens will run. Defaults to ALL
+- **Remember period**: How many seconds the password will be remembered before being erased from cache
 
 - - -
 

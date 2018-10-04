@@ -1,5 +1,11 @@
 ## Changelog
 
+### 1.6.0
+
+- [NEW] You can set a grace period (in seconds) in which the password will be remembered (defaults to always)
+- [CHANGE] Changed to a start/end token for secret encryption to overcome the limitation described in [#2](https://github.com/fcrespo82/vscode-secretlens/issues/2)
+- [FIX] Mantains the selection after encrypt/decrypt
+
 ### 1.5.0
 
 - [NEW] Now it's possible to have multiple secrets on the same line  
