@@ -82,11 +82,11 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
     }
 
     private forgetPassword(wait = null) {
-        let forgetPeriod: Number = this.config.get("forgetPeriod")
+        let rememberPeriod: Number = this.config.get("rememberPeriod")
         if (!wait) {
             this.secretLensFunction.forgetPassword()
-        } else if (wait && forgetPeriod >= 0) {
-            let forgetInMilliseconds = forgetPeriod.valueOf() * 1000
+        } else if (wait && rememberPeriod >= 0) {
+            let forgetInMilliseconds = rememberPeriod.valueOf() * 1000
             setTimeout(() => {
                 this.secretLensFunction.forgetPassword()
             }, forgetInMilliseconds)

@@ -119,11 +119,11 @@
                     "type": "string",
                     "default": "\n"
                 },
-                "secretlens.forgetPeriod": {
-                    "title": "Forget period",
+                "secretlens.rememberPeriod": {
+                    "title": "Remember period",
                     "description": "How many seconds the password will be remembered before being erased from cache",
                     "type": "integer",
-                    "default": "-1"
+                    "default": -1
                 }
             }
         }
