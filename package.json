@@ -33,24 +33,29 @@
     "contributes": {
         "commands": [
             {
-                "title": "SecretLens: Encrypt",
-                "command": "secretlens.encrypt"
+                "title": "Encrypt",
+                "command": "secretlens.encrypt",
+                "category": "SecretLens"
             },
             {
-                "title": "SecretLens: Decrypt",
-                "command": "secretlens.decrypt"
+                "title": "Decrypt",
+                "command": "secretlens.decrypt",
+                "category": "SecretLens"
             },
             {
-                "title": "SecretLens: Set password",
-                "command": "secretlens.setPassword"
+                "title": "Set password",
+                "command": "secretlens.setPassword",
+                "category": "SecretLens"
             },
             {
-                "title": "SecretLens: Forget password",
-                "command": "secretlens.forgetPassword"
+                "title": "Forget password",
+                "command": "secretlens.forgetPassword",
+                "category": "SecretLens"
             },
             {
-                "title": "SecretLens: Copy secret",
-                "command": "secretlens.copySecret"
+                "title": "Copy secret",
+                "command": "secretlens.copySecret",
+                "category": "SecretLens"
             }
         ],
         "keybindings": [
