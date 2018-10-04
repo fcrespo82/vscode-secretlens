@@ -45,6 +45,10 @@
                 "command": "secretlens.setPassword"
             },
             {
+                "title": "SecretLens: Forget password",
+                "command": "secretlens.forgetPassword"
+            },
+            {
                 "title": "SecretLens: Copy secret",
                 "command": "secretlens.copySecret"
             }
@@ -64,6 +68,11 @@
                 "command": "secretlens.setPassword",
                 "key": "ctrl+l ctrl+p",
                 "mac": "cmd+l cmd+p"
+            },
+            {
+                "command": "secretlens.forgetPassword",
+                "key": "ctrl+l ctrl+f",
+                "mac": "cmd+l cmd+f"
             },
             {
                 "command": "secretlens.copySecret",
@@ -104,6 +113,12 @@
                     "description": "Separator for when copying multiple secrets",
                     "type": "string",
                     "default": "\n"
+                },
+                "secretlens.forgetPeriod": {
+                    "title": "Forget period",
+                    "description": "How many seconds the password will be remembered before being erased from cache",
+                    "type": "integer",
+                    "default": "-1"
                 }
             }
         }

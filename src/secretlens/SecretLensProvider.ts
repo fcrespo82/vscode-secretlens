@@ -13,9 +13,10 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
     private codeLenses: vscode.CodeLens[]
     private _onDidChangeCodeLenses: vscode.EventEmitter<void> = new vscode.EventEmitter<void>()
     public readonly onDidChangeCodeLenses: vscode.Event<void> = this._onDidChangeCodeLenses.event
+    private config = vscode.workspace.getConfiguration("secretlens")
 
     constructor() {
-        this.startsWith = vscode.workspace.getConfiguration("secretlens").get<string>('startsWith')
+        this.startsWith = this.config.get('startsWith')
         this.secretLensFunction = new SecretLensFunction(this)
     }
 
@@ -24,10 +25,9 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
     }
 
     public register() {
-        const config = vscode.workspace.getConfiguration('secretlens');
-        var languages: Array<string> = config.get<Array<string>>('languages');
+        var languages: string[] = this.config.get('languages');
 
-        switch (config.get<string>('displayType').toUpperCase()) {
+        switch (this.config.get<string>('displayType').toUpperCase()) {
             case 'HOVER':
                 this.disposables.push(vscode.languages.registerHoverProvider(languages, this));
                 break;
@@ -43,7 +43,13 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
         this.disposables.push(vscode.commands.registerCommand('secretlens.encrypt', this.encrypt, this))
         this.disposables.push(vscode.commands.registerCommand('secretlens.decrypt', this.decrypt, this))
         this.disposables.push(vscode.commands.registerCommand('secretlens.setPassword', this.setPassword, this))
+        this.disposables.push(vscode.commands.registerCommand('secretlens.forgetPassword', this.forgetPassword, this))
         this.disposables.push(vscode.commands.registerTextEditorCommand('secretlens.copySecret', this.copySecret, this))
+
+        vscode.workspace.onDidChangeConfiguration((event) => {
+            this.config = vscode.workspace.getConfiguration("secretlens")
+            this.forgetPassword(true)
+        })
     }
 
     private copySecret(editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
@@ -59,10 +65,8 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
                     decrypted.push(this.secretLensFunction.decrypt(text))
                 }
             });
-            const config = vscode.workspace.getConfiguration('secretlens');
-            let copySeparator = config.get<string>("copySeparator")
+            let copySeparator: string = this.config.get("copySeparator")
             clipboardy.write(decrypted.join(copySeparator))
-
         });
     }
 
@@ -71,38 +75,60 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
     }
 
     private setPassword(): Thenable<void> {
-        return this.secretLensFunction.askPassword()
+        return this.secretLensFunction.askPassword().then(() => {
+            this.forgetPassword(true)
+            return Promise.resolve()
+        })
+    }
+
+    private forgetPassword(wait = null) {
+        let forgetPeriod: Number = this.config.get("forgetPeriod")
+        if (!wait) {
+            this.secretLensFunction.forgetPassword()
+        } else if (wait && forgetPeriod >= 0) {
+            let forgetInMilliseconds = forgetPeriod.valueOf() * 1000
+            setTimeout(() => {
+                this.secretLensFunction.forgetPassword()
+            }, forgetInMilliseconds)
+        }
     }
 
     private askPassword(): Thenable<void> {
         if (this.secretLensFunction.shouldAskForPassword) {
-            return this.secretLensFunction.askPassword()
+            return this.setPassword()
         }
         return Promise.resolve()
     }
 
     private encrypt(): void {
+        let replaces = []
         this.askPassword().then(() => {
-            vscode.window.activeTextEditor.edit((edits) => {
-                vscode.window.activeTextEditor.selections.forEach(selection => {
+            let editor = vscode.window.activeTextEditor
+            editor.edit((edits) => {
+                editor.selections.forEach(selection => {
                     let mySel = selection
                     var range = new vscode.Range(selection.start, selection.end);
                     if (mySel.isEmpty) {
-                        range = vscode.window.activeTextEditor.document.lineAt(mySel.start.line).range
+                        range = editor.document.lineAt(mySel.start.line).range
                     }
-                    var text = vscode.window.activeTextEditor.document.getText(range)
+                    var text = editor.document.getText(range)
 
                     if (!text.startsWith(this.startsWith) && text.length > 0) {
                         var encrypted = this.secretLensFunction.encrypt(text)
                         var text = this.startsWith + encrypted
                         edits.replace(range, text)
+                        replaces.push(new vscode.Selection(range.start, range.start.translate(0, text.length)))
                     }
                 })
-            });
+            }).then(() => {
+                console.log(replaces)
+                editor.selections = replaces
+            })
         })
     }
 
     private decrypt(): void {
+        let replaces = []
         this.askPassword().then(() => {
             let editor = vscode.window.activeTextEditor
             editor.edit(edits => {
@@ -117,9 +143,15 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
                         let index = line.text.indexOf(match[0])
                         let position = new vscode.Position(line.lineNumber, index)
                         let range = editor.document.getWordRangeAtPosition(position, new RegExp(this.startsWith + '.{64,}?\\b', 'g'))
+
                         edits.replace(range, this.secretLensFunction.decrypt(text))
+
+                        replaces.push(new vscode.Selection(range.start, range.start.translate(0, this.secretLensFunction.decrypt(text).length)))
                     }
                 })
+            }).then(() => {
+                console.log(replaces)
+                editor.selections = replaces
             })
         })
     }

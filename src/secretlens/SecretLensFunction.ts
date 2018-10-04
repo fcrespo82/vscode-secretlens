@@ -52,9 +52,15 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
     }
 
     public setPassword(password: string): void {
-        this.provider.reload()
         this.password = password
         this.shouldAskForPassword = false
+        this.provider.reload()
+    }
+
+    public forgetPassword(): void {
+        this.password = null
+        this.shouldAskForPassword = true
+        this.provider.reload()
     }
 
     public askPassword(): Thenable<void> {
@@ -63,7 +69,11 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
             password: true, prompt: "What's the password to encrypt/decrypt this message?", placeHolder: "password", ignoreFocusOut: true,
             validateInput: this.validatePassword
         }).then(function (password) {
-            self.setPassword(password)
+            if (password) {
+                self.setPassword(password)
+                return Promise.resolve()
+            }
+            return Promise.reject()
         })
     }
 
