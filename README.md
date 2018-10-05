@@ -1,36 +1,51 @@
-# SecretLens README
+# SecretLens
+
+- - -
+**WARNING**
+
+This update breaks compatibility with current encrypted messages **unless** you follow what is described in [Keep the previous behavior](#keep-the-previous-behavior)
+- - -
 
 A CodeLens/Hover provider that automatically decrypts identified text and show as a CodeLens/Hover.
 
-## What this extension do?
+## What does this extension do?
 
 Encrypt/decrypt text within the file.
 
 ### How?
 
-Encrypting accepts your selection, or hole line if no selection, encrypts it and replaces for the fenced block `${token}:<your text>:${token}` (token is configurable)
+Encrypting accepts your selection, or hole line if no selection, encrypts it and replaces with the fenced block `${token}<your text>${endToken}` (token/endToken are configurable)
 
-Decrypting searchs for the fenced block and then replaces by the plain text. 
+Decrypting search for the fenced block and then replaces by the plain text. 
 
 The fenced block is the default behavior because of [this limitation](https://github.com/fcrespo82/vscode-secretlens/issues/2).
-If you want to keep the previous behavior set `excludeEnd` option to true
 
+#### Keep the previous behavior
+1. Set **Token** to `secretlens:`
+2. Set **End token** to empty string or `null`
+3. Set **Exclude end** option to `true`
 
 ## Extension Commands
 
-- **Encrypt**: Encrypt the current line and replaces for `${token}:<encrypted>:${token}`
-- **Decrypt**: Decrypt the current line
-- **Set password**: Set a new password
-- **Forget password**: Forget the current password
-- **Copy secret**: Copy the selected secrets decrypted to clipboard
+| Command             | Description                                                                    |
+|:--------------------|:-------------------------------------------------------------------------------|
+| **Encrypt**         | Encrypt the text and replaces with `${token}<encrypted text>${endToken}`        |
+| **Decrypt**         | Decrypt the fenced block and replaces with `<decrypted text>`                   |
+| **Set password**    | Set a new password                                                             |
+| **Forget password** | Clears the current password                                                    |
+| **Copy secret**     | Copy the selected secrets decrypted to clipboard separated by *Copy separator* |
+
 
 ## Extension Settings
 
-- **Token**: Token for identifying the encrypted text. Defaults to `secretlens`
-- **Exclude end**: Should include the end fence when encrypting texts. Defaults to false.
-- **Copy separator**: Separator for when copying multiple secrets. Defaults to `\n`
-- **Languages**: Languages in which SecretLens will run. Defaults to ALL
-- **Remember period**: How many seconds the password will be remembered before being erased from cache
+| Setting             | Description                                                                     | Default Value |
+|:--------------------|:--------------------------------------------------------------------------------|:-------------:|
+| **Token**           | Token for identifying the begining of encrypted text                            |    `<sl:`     |
+| **End token**       | Token for identifying the end of encrypted text                                 |    `:sl>`     |
+| **Exclude end**     | Should include the end fence when encrypting texts                              |     false     |
+| **Copy separator**  | Separator for when copying multiple secrets                                     |     `\n`      |
+| **Languages**       | Languages in which SecretLens will run                                          |      ALL      |
+| **Remember period** | How many seconds the password will be remembered before being erased from cache | -1 (forever)  | 
 
 - - -
 
