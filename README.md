@@ -3,7 +3,7 @@
 - - -
 **WARNING**
 
-This update breaks compatibility with current encrypted messages **unless** you follow what is described in [Keep the previous behavior](#keep-the-previous-behavior)
+Version 2.0.0 breaks compatibility with current encrypted messages **unless** you follow what is the steps described in [Keep the previous behavior](#keep-the-previous-behavior)
 - - -
 
 A CodeLens/Hover provider that automatically decrypts identified text and show as a CodeLens/Hover.
