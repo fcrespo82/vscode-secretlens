@@ -103,19 +103,19 @@
                     "title": "Token",
                     "description": "Token for identifying the encrypted text",
                     "type": "string",
-                    "default": "secretlens:"
+                    "default": "<sl:"
                 },
                 "secretlens.endToken": {
                     "title": "End Token",
                     "description": "End token for identifying the encrypted text. Defaults to same as token",
                     "type": "string",
-                    "default": null
+                    "default": ":sl>"
                 },
                 "secretlens.excludeEnd": {
                     "title": "Exclude end fence",
                     "description": "Should the end fence be excluded when encrypting texts",
                     "type": "boolean",
-                    "default": true
+                    "default": false
                 },
                 "secretlens.languages": {
                     "title": "Language identifiers",
