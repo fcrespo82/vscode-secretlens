@@ -26,15 +26,31 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
     private configLoaded() {
         this.config = vscode.workspace.getConfiguration("secretlens")
-        this.regex = new RegExp(`${this.startToken}.+(${this.endToken})?`, "g")
+        if (this.config.get<boolean>("excludeEnd")) {
+            this.regex = new RegExp(`${this.escapeToken(this.startToken)}.+(${this.escapeToken(this.endToken)})?`, "g")
+        } else {
+            this.regex = new RegExp(`${this.escapeToken(this.startToken)}.+${this.escapeToken(this.endToken)}`, "g")
+        }
+
         this.forgetPassword(true)
     }
-    private get startToken() {
-        return this.config.get('token') + ":"
+
+    private escapeToken(token) {
+        let regexReservedCharacters = ["(", ")", "[", "]"]
+        if (regexReservedCharacters.indexOf(token) >= 0) {
+            return `\\${token}`
+        }
+        return token
+    }
+    private get startToken(): string {
+        return this.config.get('token')
     }
 
-    private get endToken() {
-        return ":" + this.config.get('token')
+    private get endToken(): string {
+        if (this.config.get("endToken")) {
+            return this.config.get('endToken')
+        }
+        return this.config.get('token')
     }
 
     private removeTokens(text: string): string {
