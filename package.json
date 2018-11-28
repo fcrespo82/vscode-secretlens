@@ -153,7 +153,7 @@
         "@types/node": "^6.0.117",
         "mocha": "^5.2.0",
         "typescript": "^2.9.2",
-        "vscode": "^1.1.21"
+        "vscode": "^1.1.22"
     },
     "dependencies": {
         "clipboardy": "^1.2.3"
