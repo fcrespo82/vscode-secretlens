@@ -1,1 +1,1 @@
-export { SecretLensProvider } from './SecretLensProvider'
+export { SecretLensProvider } from './SecretLensProvider';
