@@ -1,7 +1,7 @@
 # SecretLens
 
-![Installs](http://vsmarketplacebadge.apphb.com/installs-short/fcrespo82.secretlens.svg)
-![Rating](http://vsmarketplacebadge.apphb.com/rating-star/fcrespo82.secretlens.svg)
+![Installs](https://vsmarketplacebadge.apphb.com/installs-short/fcrespo82.secretlens.svg)
+![Rating](https://vsmarketplacebadge.apphb.com/rating-star/fcrespo82.secretlens.svg)
 
 
 - - -
