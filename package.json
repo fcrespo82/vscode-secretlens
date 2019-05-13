@@ -29,8 +29,32 @@
     "activationEvents": [
         "*"
     ],
-    "main": "./out/src/extension",
+    "main": "./dist/extension",
     "contributes": {
+        "menus": {
+            "explorer/context": [
+                {
+                    "command": "secretlens.encryptFile",
+                    "when": "explorerResourceIsFolder == false",
+                    "group": "secretLens"
+                },
+                {
+                    "command": "secretlens.encryptDir",
+                    "when": "explorerResourceIsFolder",
+                    "group": "secretLens"
+                },
+                {
+                    "command": "secretlens.decryptFile",
+                    "when": "explorerResourceIsFolder == false",
+                    "group": "secretLens"
+                },
+                {
+                    "command": "secretlens.decryptDir",
+                    "when": "explorerResourceIsFolder",
+                    "group": "secretLens"
+                }
+            ]
+        },
         "commands": [
             {
                 "title": "Encrypt",
@@ -38,8 +62,28 @@
                 "category": "SecretLens"
             },
             {
+                "title": "Encrypt file",
+                "command": "secretlens.encryptFile",
+                "category": "SecretLens"
+            },
+            {
+                "title": "Encrypt directory files",
+                "command": "secretlens.encryptDir",
+                "category": "SecretLens"
+            },
+            {
                 "title": "Decrypt",
                 "command": "secretlens.decrypt",
+                "category": "SecretLens"
+            },
+            {
+                "title": "Decrypt file",
+                "command": "secretlens.decryptFile",
+                "category": "SecretLens"
+            },
+            {
+                "title": "Decrypt directory files",
+                "command": "secretlens.decryptDir",
                 "category": "SecretLens"
             },
             {
@@ -141,9 +185,9 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
+        "vscode:prepublish": "webpack --mode production",
+        "compile": "webpack --mode none",
+        "watch": "webpack --mode none --watch",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
@@ -152,8 +196,12 @@
         "@types/mocha": "^2.2.32",
         "@types/node": "^6.14.6",
         "mocha": "^5.2.0",
-        "typescript": "^2.9.2",
-        "vscode": "^1.1.34"
+        "ts-loader": "^6.0.0",
+        "tslint": "^5.16.0",
+        "typescript": "^3.4.5",
+        "vscode": "^1.1.34",
+        "webpack": "^4.31.0",
+        "webpack-cli": "^3.3.2"
     },
     "dependencies": {
         "clipboardy": "^1.2.3"

@@ -1,7 +1,8 @@
-import { SecretLensFunction } from './SecretLensFunction';
-import * as interfaces from './interfaces';
 import * as clipboardy from 'clipboardy';
+import { lstat, lstatSync, readdir, readFile, writeFile } from 'fs';
+import { join } from 'path';
 import * as vscode from 'vscode';
+import { SecretLensFunction } from './SecretLensFunction';
 /**
  * SecretLensProvider
  */
@@ -74,7 +75,11 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
         }
 
         this.disposables.push(vscode.commands.registerCommand('secretlens.encrypt', this.encrypt, this));
+        this.disposables.push(vscode.commands.registerCommand('secretlens.encryptFile', this.encryptFile, this));
+        this.disposables.push(vscode.commands.registerCommand('secretlens.encryptDir', this.encryptDir, this));
         this.disposables.push(vscode.commands.registerCommand('secretlens.decrypt', this.decrypt, this));
+        this.disposables.push(vscode.commands.registerCommand('secretlens.decryptFile', this.decryptFile, this));
+        this.disposables.push(vscode.commands.registerCommand('secretlens.decryptDir', this.decryptDir, this));
         this.disposables.push(vscode.commands.registerCommand('secretlens.setPassword', this.setPassword, this));
         this.disposables.push(vscode.commands.registerCommand('secretlens.forgetPassword', this.forgetPassword, this));
         this.disposables.push(vscode.commands.registerTextEditorCommand('secretlens.copySecret', this.copySecret, this));
@@ -130,6 +135,79 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
             return this.setPassword();
         }
         return Promise.resolve();
+    }
+
+    private encryptFile(uri: vscode.Uri): void {
+        this.askPassword().then(() => {
+            readFile(uri.fsPath, (err, data) => {
+                if (err) { throw err; }
+                const encrypted = this.secretLensFunction.encrypt(data.toString());
+                const text = this.startToken + encrypted + (!this.config.get("excludeEnd") ? this.endToken : "");
+                writeFile(uri.fsPath, text, (err) => {
+                    if (err) { throw err; }
+                });
+            });
+        });
+    }
+
+    private encryptDir(uri: vscode.Uri): void {
+        this.askPassword().then(() => {
+            lstat(uri.fsPath, (err, stats) => {
+                if (err) { throw err; }
+                if (stats.isDirectory()) {
+                    readdir(uri.fsPath, (err, files) => {
+                        if (err) { throw err; }
+                        files.forEach(file => {
+                            const fullPath = join(uri.fsPath, file);
+                            if (lstatSync(fullPath).isDirectory()) {
+                                this.encryptDir(vscode.Uri.file(fullPath));
+                            } else {
+                                this.encryptFile(vscode.Uri.file(fullPath));
+                            }
+                        });
+                    });
+                }
+            });
+        });
+    }
+
+    private decryptFile(uri: vscode.Uri): void {
+        this.askPassword().then(() => {
+            const regex = new RegExp(this.regex);
+            readFile(uri.fsPath, (err, data) => {
+                if (err) { throw err; }
+                if (regex.test(data.toString())) {
+                    let text = this.removeTokens(data.toString());
+                    const textDecrypted = this.secretLensFunction.decrypt(text);
+                    writeFile(uri.fsPath, textDecrypted, (err) => {
+                        if (err) { throw err; }
+                    });
+                } else {
+                    console.log("This file was not encrypted with SecretLens");
+                }
+            });
+        });
+    }
+
+    private decryptDir(uri: vscode.Uri): void {
+        this.askPassword().then(() => {
+            lstat(uri.fsPath, (err, stats) => {
+                if (err) { throw err; }
+                if (stats.isDirectory()) {
+                    readdir(uri.fsPath, (err, files) => {
+                        if (err) { throw err; }
+                        files.forEach(file => {
+                            const fullPath = join(uri.fsPath, file);
+                            if (lstatSync(fullPath).isDirectory()) {
+                                this.decryptDir(vscode.Uri.file(fullPath));
+                            } else {
+                                this.decryptFile(vscode.Uri.file(fullPath));
+                            }
+                        });
+                    });
+                }
+            });
+        });
     }
 
     private encrypt(): void {
