@@ -180,6 +180,12 @@
                     "description": "How many seconds the password will be remembered before being erased from cache",
                     "type": "integer",
                     "default": -1
+                },
+                "secretlens.recursiveDirectories": {
+                    "title": "Recursive",
+                    "description": "Go inside subdirectories to encrypt/decrypt files",
+                    "type": "boolean",
+                    "default": false
                 }
             }
         }
