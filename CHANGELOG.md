@@ -1,5 +1,10 @@
 ## Changelog
 
+### 2.1.0
+
+- [NEW] You can now encrypt/decrypt hole files
+- [NEW] You can now encrypt/decrypt each file inside a folder (can be configured to do it recursively)
+
 ### 2.0.0
 
 - [NEW] You can set a grace period (in seconds) in which the password will be remembered (defaults to always)
