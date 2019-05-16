@@ -141,11 +141,15 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
         this.askPassword().then(() => {
             readFile(uri.fsPath, (err, data) => {
                 if (err) { throw err; }
+                const originalText = data.toString();
                 const encrypted = this.secretLensFunction.encrypt(data.toString());
                 const text = this.startToken + encrypted + (!this.config.get("excludeEnd") ? this.endToken : "");
-                writeFile(uri.fsPath, text, (err) => {
-                    if (err) { throw err; }
-                });
+                const regex = new RegExp(this.regex);
+                if (!regex.test(data.toString())) {
+                    writeFile(uri.fsPath, text, (err) => {
+                        if (err) { throw err; }
+                    });
+                }
             });
         });
     }
@@ -159,7 +163,7 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
                         if (err) { throw err; }
                         files.forEach(file => {
                             const fullPath = join(uri.fsPath, file);
-                            if (lstatSync(fullPath).isDirectory()) {
+                            if (this.config.get("recursiveDirectories") && lstatSync(fullPath).isDirectory()) {
                                 this.encryptDir(vscode.Uri.file(fullPath));
                             } else {
                                 this.encryptFile(vscode.Uri.file(fullPath));
@@ -198,7 +202,7 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
                         if (err) { throw err; }
                         files.forEach(file => {
                             const fullPath = join(uri.fsPath, file);
-                            if (lstatSync(fullPath).isDirectory()) {
+                            if (this.config.get("recursiveDirectories") && lstatSync(fullPath).isDirectory()) {
                                 this.decryptDir(vscode.Uri.file(fullPath));
                             } else {
                                 this.decryptFile(vscode.Uri.file(fullPath));
@@ -221,8 +225,8 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
                         range = editor.document.lineAt(selection.start.line).range;
                     }
                     var text = editor.document.getText(range);
-
-                    if (!this.regex.test(text) && text.length > 0) {
+                    const regex = new RegExp(this.regex);
+                    if (!regex.test(text) && text.length > 0) {
                         var encrypted = this.secretLensFunction.encrypt(text);
                         text = this.startToken + encrypted + (!this.config.get("excludeEnd") ? this.endToken : "");
                         edits.replace(range, text);
