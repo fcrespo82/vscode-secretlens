@@ -2,7 +2,7 @@
     "name": "secretlens",
     "displayName": "SecretLens",
     "description": "Show a codelens decrypting a secret in the document",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "icon": "resources/icon.png",
     "publisher": "fcrespo82",
     "homepage": "https://github.com/fcrespo82/vscode-secretlens",
