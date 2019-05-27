@@ -6,7 +6,9 @@
         {
             "type": "npm",
             "script": "watch",
-            "problemMatcher": [ "$ts-webpack" ],
+            "problemMatcher": [
+                "$ts-webpack"
+            ],
             "isBackground": true,
             "presentation": {
                 "reveal": "never"
