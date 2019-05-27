@@ -8,12 +8,13 @@ var secretLensProvider : SecretLensProvider;
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export function activate(context: ExtensionContext) {
+export function activate(context: ExtensionContext): Promise<boolean> {
     secretLensProvider = new SecretLensProvider();
-    secretLensProvider.register();
+    return secretLensProvider.register();
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {
+export function deactivate(): Promise<boolean> {
     secretLensProvider.dispose();
+    return Promise.resolve(true);
 }

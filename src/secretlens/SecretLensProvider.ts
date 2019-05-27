@@ -58,35 +58,40 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
         return text.replace(this.startToken, "").replace(this.endToken, "");
     }
 
-    public register() {
-        var languages: string[] = this.config.get('languages');
+    public register(): Promise<boolean> {
+        try {
+            var languages: string[] = this.config.get('languages');
 
-        switch (this.config.get<string>('displayType').toUpperCase()) {
-            case 'HOVER':
-                this.disposables.push(vscode.languages.registerHoverProvider(languages, this));
-                break;
-            case 'BOTH':
-                this.disposables.push(vscode.languages.registerHoverProvider(languages, this));
-                this.disposables.push(vscode.languages.registerCodeLensProvider(languages, this));
-                break;
-            default:
-                this.disposables.push(vscode.languages.registerCodeLensProvider(languages, this));
-                break;
+            switch (this.config.get<string>('displayType').toUpperCase()) {
+                case 'HOVER':
+                    this.disposables.push(vscode.languages.registerHoverProvider(languages, this));
+                    break;
+                case 'BOTH':
+                    this.disposables.push(vscode.languages.registerHoverProvider(languages, this));
+                    this.disposables.push(vscode.languages.registerCodeLensProvider(languages, this));
+                    break;
+                default:
+                    this.disposables.push(vscode.languages.registerCodeLensProvider(languages, this));
+                    break;
+            }
+
+            this.disposables.push(vscode.commands.registerCommand('secretlens.encrypt', this.encrypt, this));
+            this.disposables.push(vscode.commands.registerCommand('secretlens.encryptFile', this.encryptFile, this));
+            this.disposables.push(vscode.commands.registerCommand('secretlens.encryptDir', this.encryptDir, this));
+            this.disposables.push(vscode.commands.registerCommand('secretlens.decrypt', this.decrypt, this));
+            this.disposables.push(vscode.commands.registerCommand('secretlens.decryptFile', this.decryptFile, this));
+            this.disposables.push(vscode.commands.registerCommand('secretlens.decryptDir', this.decryptDir, this));
+            this.disposables.push(vscode.commands.registerCommand('secretlens.setPassword', this.setPassword, this));
+            this.disposables.push(vscode.commands.registerCommand('secretlens.forgetPassword', this.forgetPassword, this));
+            this.disposables.push(vscode.commands.registerTextEditorCommand('secretlens.copySecret', this.copySecret, this));
+
+            vscode.workspace.onDidChangeConfiguration((event) => {
+                this.configLoaded();
+            });
+            return Promise.resolve(true);
+        } catch (error) {
+            return Promise.reject(false);
         }
-
-        this.disposables.push(vscode.commands.registerCommand('secretlens.encrypt', this.encrypt, this));
-        this.disposables.push(vscode.commands.registerCommand('secretlens.encryptFile', this.encryptFile, this));
-        this.disposables.push(vscode.commands.registerCommand('secretlens.encryptDir', this.encryptDir, this));
-        this.disposables.push(vscode.commands.registerCommand('secretlens.decrypt', this.decrypt, this));
-        this.disposables.push(vscode.commands.registerCommand('secretlens.decryptFile', this.decryptFile, this));
-        this.disposables.push(vscode.commands.registerCommand('secretlens.decryptDir', this.decryptDir, this));
-        this.disposables.push(vscode.commands.registerCommand('secretlens.setPassword', this.setPassword, this));
-        this.disposables.push(vscode.commands.registerCommand('secretlens.forgetPassword', this.forgetPassword, this));
-        this.disposables.push(vscode.commands.registerTextEditorCommand('secretlens.copySecret', this.copySecret, this));
-
-        vscode.workspace.onDidChangeConfiguration((event) => {
-            this.configLoaded();
-        });
     }
 
     private copySecret(editor: vscode.TextEditor, edit: vscode.TextEditorEdit) {
