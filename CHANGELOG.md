@@ -1,5 +1,13 @@
 ## Changelog
 
+### 2.1.3
+
+- [FIX] Fix node deprecation causing extension not working at all (bug #9)
+
+### 2.1.2
+
+- [NEW] Adopt no reload on install
+
 ### 2.1.0
 
 - [NEW] You can now encrypt/decrypt hole files

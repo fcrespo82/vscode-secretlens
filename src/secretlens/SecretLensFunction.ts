@@ -21,7 +21,7 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
             var salt = crypto.randomBytes(this.saltSize).toString('hex');
             saltedPassword = salt + this.password;
         }
-        const cipher = crypto.createCipher('aes256', saltedPassword);
+        const cipher = crypto.createCipher('aes-256-cbc', saltedPassword);
         encrypted = cipher.update(inputText, 'utf8', 'hex');
         encrypted += cipher.final('hex');
         if (this.useSalt) {
@@ -40,7 +40,7 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
             inputText = inputText.replace(salt, "");
             saltedPassword = salt + this.password;
         }
-        const decipher = crypto.createDecipher('aes256', saltedPassword);
+        const decipher = crypto.createDecipher('aes-256-cbc', saltedPassword);
         decrypted = decipher.update(inputText, 'hex', 'utf8');
         decrypted += decipher.final('utf8');
         ended = true;
