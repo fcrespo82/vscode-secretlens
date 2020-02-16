@@ -186,6 +186,16 @@
                     "description": "Go inside subdirectories to encrypt/decrypt files",
                     "type": "boolean",
                     "default": false
+                },
+                "secretlens.cryptoMethod": {
+                    "title": "Crypto method",
+                    "description": "How the secrets are encrypted.\ndefault: legacy implementation\npbkdf2: openssl password based key derivation function 2\n    equivalent to shell command [openssl enc -aes-256-cbc -pbkdf2 | xxd -p]\n    decrypt with [xxd -p -r | openssl enc -aes-256-cbc -pbkdf2 -d]",
+                    "type": "string",
+                    "enum": [
+                        "default",
+                        "pbkdf2"
+                    ],
+                    "default": "default"
                 }
             }
         }
@@ -207,7 +217,7 @@
         "tslint": "^5.16.0",
         "typescript": "^3.4.5",
         "vscode": "^1.1.34",
-        "webpack": "^4.31.0",
+        "webpack": "^4.41.6",
         "webpack-cli": "^3.3.6"
     },
     "dependencies": {

@@ -147,7 +147,7 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
             readFile(uri.fsPath, (err, data) => {
                 if (err) { throw err; }
                 const originalText = data.toString();
-                const encrypted = this.secretLensFunction.encrypt(data.toString());
+                const encrypted = this.secretLensFunction.encrypt(data.toString(), this.config.get("cryptoMethod"));
                 const text = this.startToken + encrypted + (!this.config.get("excludeEnd") ? this.endToken : "");
                 const regex = new RegExp(this.regex);
                 if (!regex.test(data.toString())) {
@@ -232,7 +232,7 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
                     var text = editor.document.getText(range);
                     const regex = new RegExp(this.regex);
                     if (!regex.test(text) && text.length > 0) {
-                        var encrypted = this.secretLensFunction.encrypt(text);
+                        var encrypted = this.secretLensFunction.encrypt(text, this.config.get("cryptoMethod"));
                         text = this.startToken + encrypted + (!this.config.get("excludeEnd") ? this.endToken : "");
                         edits.replace(range, text);
                         replaces.push(new vscode.Selection(range.start, range.start.translate(0, text.length)));
