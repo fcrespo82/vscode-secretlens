@@ -20,7 +20,12 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
 
             // Equivalent shell command: openssl enc -aes-256-cbc -pbkdf2 | xxd -p | tr -d "\n"
             //
-            var binsalt = crypto.randomBytes(8);
+            var binsalt;
+            if (this.useSalt) {
+                binsalt = crypto.randomBytes(8);
+            } else {
+                binsalt = Buffer.alloc(8);
+            }
             let derivedKey = crypto.pbkdf2Sync(this.password, binsalt, 10000, 48, 'sha256');
             let key = derivedKey.slice(0, 32);
             let iv = derivedKey.slice(32, 48);
