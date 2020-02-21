@@ -29,6 +29,10 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
             var encrypted = cipher.update(inputText, 'utf8', 'hex');
             encrypted += cipher.final('hex');
             return 'pbkdf2:53616c7465645f5f' + binsalt.toString('hex') + encrypted;
+            // '53616c7465645f5f' is hexa for string "Salted__".
+            // This is added for compatibility with the openssl command.
+            // Specifically, with openssl salt generation algorithm, the first 8 bytes
+            // are always "Salted__" and only the last five bytes are random.
         } else {
             var encrypted: string = "";
             var saltedPassword = this.password;
