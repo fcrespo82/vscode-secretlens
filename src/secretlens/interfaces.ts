@@ -1,5 +1,5 @@
 export interface ISecretLensFunction {
-    encrypt(inputText: string): string;
+    encrypt(inputText: string, cryptoMetho: string): string;
     decrypt(inputText: string): string;
     askPassword(): void;
     shouldAskForPassword: boolean;
