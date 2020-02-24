@@ -144,8 +144,8 @@
                     "default": "CodeLens"
                 },
                 "secretlens.token": {
-                    "title": "Token",
-                    "description": "Token for identifying the encrypted text",
+                    "title": "Start Token",
+                    "description": "Start token for identifying the encrypted text",
                     "type": "string",
                     "default": "<sl:"
                 },
@@ -192,10 +192,10 @@
                     "description": "How the secrets are encrypted.\ndefault: legacy implementation\npbkdf2: openssl password based key derivation function 2\n    equivalent to shell command [openssl enc -aes-256-cbc -pbkdf2 | xxd -p]\n    decrypt with [xxd -p -r | openssl enc -aes-256-cbc -pbkdf2 -d]",
                     "type": "string",
                     "enum": [
-                        "default",
+                        "legacy",
                         "pbkdf2"
                     ],
-                    "default": "default"
+                    "default": "legacy"
                 }
             }
         }

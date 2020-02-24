@@ -1,5 +1,9 @@
 ## Changelog
 
+### 2.2.0
+
+- [NEW] Added a second crypto option ([pbkdf2](https://en.wikipedia.org/wiki/PBKDF2)) that for better long term support. Thanks [@fredatatlantis](https://github.com/fredatatlantis)!
+
 ### 2.1.3
 
 - [FIX] Fix node deprecation causing extension not working at all (bug #9)
