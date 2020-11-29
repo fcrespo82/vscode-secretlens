@@ -3,8 +3,11 @@ All notable changes to the "vscode-markdown-table-formatter" extension will be d
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [2.2.1] - 2020-11-29
 
-## [2.2.0] - 2020-02-24T
+- [CHANGE] Upgraded dependencies
+
+## [2.2.0] - 2020-02-24
 
 - [NEW] Added a second crypto option ([pbkdf2](https://en.wikipedia.org/wiki/PBKDF2)) that for better long term support. Thanks [@fredatatlantis](https://github.com/fredatatlantis)!
 

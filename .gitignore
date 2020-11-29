@@ -2,3 +2,4 @@ out
 node_modules
 vsix_packages
 dist
+.vscode-test
