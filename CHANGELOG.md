@@ -3,6 +3,11 @@ All notable changes to the "vscode-markdown-table-formatter" extension will be d
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [2.2.2] - 2021-10-19
+
+- [FIX] Copy to clipboard not working on Windows
+- [REMOVED] clipboardy dependency, now it uses native vscode API
+
 ## [2.2.1] - 2020-11-29
 
 - [CHANGE] Upgraded dependencies

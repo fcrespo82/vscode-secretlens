@@ -10,5 +10,6 @@
     "cSpell.words": [
         "clipboardy",
         "secretlens"
-    ] // we want to use the TS server from our node_modules folder to control its version
+    ],
+    "python.pythonPath": "c:\\Users\\fernando\\Projetos\\vscode-secretlens\\.venv\\Scripts\\python.exe" // we want to use the TS server from our node_modules folder to control its version
 }

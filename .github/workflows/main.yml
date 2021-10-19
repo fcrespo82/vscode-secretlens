@@ -52,3 +52,9 @@ jobs:
         asset_path: ${{ steps.package.outputs.package_name }}
         asset_name: ${{ steps.package.outputs.package_name }}
         asset_content_type: application/zip
+    - name: Publish to Open VSX Registry
+      uses: HaaLeo/publish-vscode-extension@v0
+      with:
+        packagePath: ''
+        extensionFile: ${{ steps.package.outputs.package_name }}
+        pat: ${{ secrets.OPEN_VSX_TOKEN }}
