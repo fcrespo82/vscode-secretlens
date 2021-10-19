@@ -3,11 +3,12 @@
 'use strict';
 
 const path = require('path');
+const { ESBuildMinifyPlugin } = require('esbuild-loader');
 
 /**@type {import('webpack').Configuration}*/
-const config = {
+module.exports = {
   target: 'node', // vscode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
-
+  mode: 'production',
   entry: './src/extension.ts', // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
   output: {
     // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
@@ -26,16 +27,30 @@ const config = {
   },
   module: {
     rules: [
+      // {
+      //   test: /\.ts$/,
+      //   exclude: /node_modules/,
+      //   use: [
+      //     {
+      //       loader: 'esbuild-loader'
+      //     }
+      //   ]
+      // },
       {
         test: /\.ts$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: 'ts-loader'
-          }
-        ]
+        loader: 'esbuild-loader',
+        options: {
+          loader: 'tsx',
+          target: 'es2015',
+        }
       }
+
     ]
-  }
+  },
+  optimization: {
+    minimizer: [
+      // Use esbuild to minify
+      new ESBuildMinifyPlugin(),
+    ],
+  },
 };
-module.exports = config;
