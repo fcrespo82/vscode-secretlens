@@ -13,6 +13,7 @@
     "bugs": {
         "url": "https://github.com/fcrespo82/vscode-secretlens/issues"
     },
+    "license": "MIT",
     "keywords": [
         "secret",
         "crypto",
