@@ -217,7 +217,7 @@
         "@vscode/test-electron": "^1.6.2",
         "esbuild": "^0.13.8",
         "glob": "^7.1.2",
-        "mocha": "^5.2.0",
+        "mocha": "^10.2.0",
         "tslint": "^5.16.0",
         "typescript": "^4.4.4",
         "vsce": "^1.100.1"
