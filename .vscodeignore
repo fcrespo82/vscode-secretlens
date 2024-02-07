@@ -13,7 +13,6 @@ scripts/**
 vsix_packages
 .vscode
 node_modules
-out/
 src/
 tsconfig.json
 webpack.config.js
