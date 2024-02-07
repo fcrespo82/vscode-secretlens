@@ -10,10 +10,14 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 
 	private regex: RegExp;
 	private disposables: vscode.Disposable[] = [];
+	
+	private hoverProvider?: vscode.Disposable;
+	private codeLensProvider?: vscode.Disposable;
+
 	private secretLensFunction: SecretLensFunction;
 	private codeLenses: vscode.CodeLens[];
-	private _onDidChangeCodeLenses: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
-	public readonly onDidChangeCodeLenses: vscode.Event<void> = this._onDidChangeCodeLenses.event;
+	private _onDidChangeCodeLenses = new vscode.EventEmitter<vscode.CodeLensProvider>();
+
 	private config: vscode.WorkspaceConfiguration;
 
 	constructor() {
@@ -25,7 +29,8 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 		this._onDidChangeCodeLenses.fire();
 	}
 
-	private configLoaded() {
+	private configLoaded(event?: vscode.ConfigurationChangeEvent) {
+		
 		this.config = vscode.workspace.getConfiguration("secretlens");
 		if (this.config.get<boolean>("excludeEnd")) {
 			this.regex = new RegExp(`${this.escapeToken(this.startToken)}.+(${this.escapeToken(this.endToken)})?`, "g");
@@ -34,6 +39,10 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 		}
 
 		this.forgetPassword(true);
+
+		if (event?.affectsConfiguration("secretlens.displayType")) {
+			this.registerDisplayType();
+		}
 	}
 
 	private escapeToken(token) {
@@ -58,39 +67,46 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 		return text.replace(this.startToken, "").replace(this.endToken, "");
 	}
 
-	public register(): Promise<boolean> {
-		try {
-			var languages: string[] = this.config.get('languages');
+	public register() {
+		this.disposables.push(vscode.commands.registerCommand('secretlens.encrypt', this.encrypt, this));
+		this.disposables.push(vscode.commands.registerCommand('secretlens.encryptFile', this.encryptFile, this));
+		this.disposables.push(vscode.commands.registerCommand('secretlens.encryptDir', this.encryptDir, this));
+		this.disposables.push(vscode.commands.registerCommand('secretlens.decrypt', this.decrypt, this));
+		this.disposables.push(vscode.commands.registerCommand('secretlens.decryptFile', this.decryptFile, this));
+		this.disposables.push(vscode.commands.registerCommand('secretlens.decryptDir', this.decryptDir, this));
+		this.disposables.push(vscode.commands.registerCommand('secretlens.setPassword', this.setPassword, this));
+		this.disposables.push(vscode.commands.registerCommand('secretlens.forgetPassword', this.forgetPassword, this));
+		this.disposables.push(vscode.commands.registerTextEditorCommand('secretlens.copySecret', this.copySecret, this));
+		
+		this.registerDisplayType();
 
-			switch (this.config.get<string>('displayType').toUpperCase()) {
-				case 'HOVER':
-					this.disposables.push(vscode.languages.registerHoverProvider(languages, this));
-					break;
-				case 'BOTH':
-					this.disposables.push(vscode.languages.registerHoverProvider(languages, this));
-					this.disposables.push(vscode.languages.registerCodeLensProvider(languages, this));
-					break;
-				default:
-					this.disposables.push(vscode.languages.registerCodeLensProvider(languages, this));
-					break;
-			}
+		vscode.workspace.onDidChangeConfiguration((event) => {
+			this.configLoaded(event);
+		});
+	}
 
-			this.disposables.push(vscode.commands.registerCommand('secretlens.encrypt', this.encrypt, this));
-			this.disposables.push(vscode.commands.registerCommand('secretlens.encryptFile', this.encryptFile, this));
-			this.disposables.push(vscode.commands.registerCommand('secretlens.encryptDir', this.encryptDir, this));
-			this.disposables.push(vscode.commands.registerCommand('secretlens.decrypt', this.decrypt, this));
-			this.disposables.push(vscode.commands.registerCommand('secretlens.decryptFile', this.decryptFile, this));
-			this.disposables.push(vscode.commands.registerCommand('secretlens.decryptDir', this.decryptDir, this));
-			this.disposables.push(vscode.commands.registerCommand('secretlens.setPassword', this.setPassword, this));
-			this.disposables.push(vscode.commands.registerCommand('secretlens.forgetPassword', this.forgetPassword, this));
-			this.disposables.push(vscode.commands.registerTextEditorCommand('secretlens.copySecret', this.copySecret, this));
+	private registerDisplayType() {
+		var languages: string[] = this.config.get('languages');
 
-			vscode.workspace.onDidChangeConfiguration((event) => {
-				this.configLoaded();
-			});
-			return Promise.resolve(true);
-		} catch (error) {
-			return Promise.reject(false);
+		this.hoverProvider?.dispose();
+		this.codeLensProvider?.dispose();
+		switch (this.config.get<string>('displayType').toUpperCase()) {
+			case 'HOVER':
+				this.hoverProvider = vscode.languages.registerHoverProvider(languages, this);
+				this.disposables.push(this.hoverProvider);
+				break;
+			case 'CODELENS':
+				this.codeLensProvider = vscode.languages.registerCodeLensProvider(languages, this);
+				this.disposables.push(this.codeLensProvider);
+				this._onDidChangeCodeLenses.fire();
+				break;
+			case 'BOTH':	
+				this.hoverProvider = vscode.languages.registerHoverProvider(languages, this);
+				this.disposables.push(this.hoverProvider);
+				this.codeLensProvider = vscode.languages.registerCodeLensProvider(languages, this);
+				this.disposables.push(this.codeLensProvider);
+				this._onDidChangeCodeLenses.fire();
+				break;
 		}
 	}
 
@@ -129,7 +145,7 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 	}
 
 	private forgetPassword(wait = null) {
-		let rememberPeriod: Number = this.config.get("rememberPeriod");
+		let rememberPeriod: number = this.config.get("rememberPeriod");
 		if (!wait) {
 			this.secretLensFunction.forgetPassword();
 		} else if (wait && rememberPeriod >= 0) {
@@ -292,12 +308,15 @@ export class SecretLensProvider implements vscode.CodeLensProvider, vscode.Dispo
 			let indexOf = line.text.indexOf(matches[0]);
 			let position = new vscode.Position(line.lineNumber, indexOf);
 			let range = document.getWordRangeAtPosition(position, new RegExp(this.regex));
-			this.codeLenses.push(new vscode.CodeLens(range));
+
+			let codeLens = new vscode.CodeLens(range);
+			codeLens = this.resolveCodeLens(codeLens);
+			this.codeLenses.push(codeLens);
 		}
 		return this.codeLenses;
 	}
 
-	public resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken) {
+	public resolveCodeLens(codeLens: vscode.CodeLens, token?: vscode.CancellationToken) {
 		var text = vscode.window.activeTextEditor.document.getText(codeLens.range);
 
 		if (this.secretLensFunction.shouldAskForPassword) {
