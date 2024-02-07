@@ -1,228 +1,227 @@
 {
-    "name": "secretlens",
-    "displayName": "SecretLens",
-    "description": "Show a codelens decrypting a secret in the document",
-    "version": "2.2.2",
-    "icon": "resources/icon.png",
-    "publisher": "fcrespo82",
-    "homepage": "https://github.com/fcrespo82/vscode-secretlens",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/fcrespo82/vscode-secretlens"
-    },
-    "bugs": {
-        "url": "https://github.com/fcrespo82/vscode-secretlens/issues"
-    },
-    "license": "MIT",
-    "keywords": [
-        "secret",
-        "crypto",
-        "cypher",
-        "encrypt",
-        "decrypt"
-    ],
-    "engines": {
-        "vscode": "^1.34.0"
-    },
-    "categories": [
-        "Other"
-    ],
-    "activationEvents": [
-        "*"
-    ],
-    "main": "./out/extension.js",
-    "contributes": {
-        "menus": {
-            "explorer/context": [
-                {
-                    "command": "secretlens.encryptFile",
-                    "when": "explorerResourceIsFolder == false",
-                    "group": "secretLens"
-                },
-                {
-                    "command": "secretlens.encryptDir",
-                    "when": "explorerResourceIsFolder",
-                    "group": "secretLens"
-                },
-                {
-                    "command": "secretlens.decryptFile",
-                    "when": "explorerResourceIsFolder == false",
-                    "group": "secretLens"
-                },
-                {
-                    "command": "secretlens.decryptDir",
-                    "when": "explorerResourceIsFolder",
-                    "group": "secretLens"
-                }
-            ]
+  "name": "secretlens",
+  "displayName": "SecretLens",
+  "description": "Show a codelens decrypting a secret in the document",
+  "version": "2.2.2",
+  "icon": "resources/icon.png",
+  "publisher": "fcrespo82",
+  "homepage": "https://github.com/fcrespo82/vscode-secretlens",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fcrespo82/vscode-secretlens"
+  },
+  "bugs": {
+    "url": "https://github.com/fcrespo82/vscode-secretlens/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "secret",
+    "crypto",
+    "cypher",
+    "encrypt",
+    "decrypt"
+  ],
+  "engines": {
+    "vscode": "^1.34.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "secretlens.encryptFile",
+          "when": "explorerResourceIsFolder == false",
+          "group": "secretLens"
         },
-        "commands": [
-            {
-                "title": "Encrypt",
-                "command": "secretlens.encrypt",
-                "category": "SecretLens"
-            },
-            {
-                "title": "Encrypt file",
-                "command": "secretlens.encryptFile",
-                "category": "SecretLens"
-            },
-            {
-                "title": "Encrypt directory files",
-                "command": "secretlens.encryptDir",
-                "category": "SecretLens"
-            },
-            {
-                "title": "Decrypt",
-                "command": "secretlens.decrypt",
-                "category": "SecretLens"
-            },
-            {
-                "title": "Decrypt file",
-                "command": "secretlens.decryptFile",
-                "category": "SecretLens"
-            },
-            {
-                "title": "Decrypt directory files",
-                "command": "secretlens.decryptDir",
-                "category": "SecretLens"
-            },
-            {
-                "title": "Set password",
-                "command": "secretlens.setPassword",
-                "category": "SecretLens"
-            },
-            {
-                "title": "Forget password",
-                "command": "secretlens.forgetPassword",
-                "category": "SecretLens"
-            },
-            {
-                "title": "Copy secret",
-                "command": "secretlens.copySecret",
-                "category": "SecretLens"
-            }
-        ],
-        "keybindings": [
-            {
-                "command": "secretlens.encrypt",
-                "key": "ctrl+l ctrl+e",
-                "mac": "cmd+l cmd+e"
-            },
-            {
-                "command": "secretlens.decrypt",
-                "key": "ctrl+l ctrl+d",
-                "mac": "cmd+l cmd+d"
-            },
-            {
-                "command": "secretlens.setPassword",
-                "key": "ctrl+l ctrl+p",
-                "mac": "cmd+l cmd+p"
-            },
-            {
-                "command": "secretlens.forgetPassword",
-                "key": "ctrl+l ctrl+f",
-                "mac": "cmd+l cmd+f"
-            },
-            {
-                "command": "secretlens.copySecret",
-                "key": "ctrl+l ctrl+c",
-                "mac": "cmd+l cmd+c"
-            }
-        ],
-        "configuration": {
-            "title": "SecretLens",
-            "properties": {
-                "secretlens.displayType": {
-                    "title": "How to display the secret",
-                    "description": "Display the secret as a inline CodeLens, a Hover Provider or Both.\nThe extensions must be reloaded to this setting take effect.",
-                    "type": "string",
-                    "enum": [
-                        "CodeLens",
-                        "Hover",
-                        "Both"
-                    ],
-                    "default": "CodeLens"
-                },
-                "secretlens.token": {
-                    "title": "Start Token",
-                    "description": "Start token for identifying the encrypted text",
-                    "type": "string",
-                    "default": "<sl:"
-                },
-                "secretlens.endToken": {
-                    "title": "End Token",
-                    "description": "End token for identifying the encrypted text. Defaults to same as token",
-                    "type": "string",
-                    "default": ":sl>"
-                },
-                "secretlens.excludeEnd": {
-                    "title": "Exclude end fence",
-                    "description": "Should the end fence be excluded when encrypting texts",
-                    "type": "boolean",
-                    "default": false
-                },
-                "secretlens.languages": {
-                    "title": "Language identifiers",
-                    "description": "Language identifiers in which the extension will act",
-                    "type": "array",
-                    "default": [
-                        "*"
-                    ]
-                },
-                "secretlens.copySeparator": {
-                    "title": "Copy separator",
-                    "description": "Separator for when copying multiple secrets",
-                    "type": "string",
-                    "default": "\n"
-                },
-                "secretlens.rememberPeriod": {
-                    "title": "Remember period",
-                    "description": "How many seconds the password will be remembered before being erased from cache",
-                    "type": "integer",
-                    "default": -1
-                },
-                "secretlens.recursiveDirectories": {
-                    "title": "Recursive",
-                    "description": "Go inside subdirectories to encrypt/decrypt files",
-                    "type": "boolean",
-                    "default": false
-                },
-                "secretlens.cryptoMethod": {
-                    "title": "Crypto method",
-                    "description": "How the secrets are encrypted.\ndefault: legacy implementation\npbkdf2: openssl password based key derivation function 2\n    equivalent to shell command [openssl enc -aes-256-cbc -pbkdf2 | xxd -p]\n    decrypt with [xxd -p -r | openssl enc -aes-256-cbc -pbkdf2 -d]",
-                    "type": "string",
-                    "enum": [
-                        "legacy",
-                        "pbkdf2"
-                    ],
-                    "default": "legacy"
-                }
-            }
+        {
+          "command": "secretlens.encryptDir",
+          "when": "explorerResourceIsFolder",
+          "group": "secretLens"
+        },
+        {
+          "command": "secretlens.decryptFile",
+          "when": "explorerResourceIsFolder == false",
+          "group": "secretLens"
+        },
+        {
+          "command": "secretlens.decryptDir",
+          "when": "explorerResourceIsFolder",
+          "group": "secretLens"
         }
+      ]
     },
-    "scripts": {
-        "vscode:prepublish": "npm run -S esbuild-base -- --minify",
-        "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
-        "esbuild": "npm run -S esbuild-base -- --sourcemap",
-        "watch": "npm run -S esbuild-base -- --sourcemap --watch",
-        "test-compile": "tsc -p ./",
-        "lint": "eslint .",
-        "test": "node ./out/test/runTest.js"
-    },
-    "devDependencies": {
-        "@types/mocha": "^5.2.0",
-        "@types/node": "^14.17.27",
-        "@types/vscode": "^1.34.0",
-        "@vscode/test-electron": "^1.6.2",
-        "esbuild": "^0.13.8",
-        "glob": "^7.1.2",
-        "mocha": "^5.2.0",
-        "tslint": "^5.16.0",
-        "typescript": "^4.4.4",
-        "vsce": "^1.100.1"
-    },
-    "dependencies": {
-        "clipboardy": "^3.0.0"
+    "commands": [
+      {
+        "title": "Encrypt",
+        "command": "secretlens.encrypt",
+        "category": "SecretLens"
+      },
+      {
+        "title": "Encrypt file",
+        "command": "secretlens.encryptFile",
+        "category": "SecretLens"
+      },
+      {
+        "title": "Encrypt directory files",
+        "command": "secretlens.encryptDir",
+        "category": "SecretLens"
+      },
+      {
+        "title": "Decrypt",
+        "command": "secretlens.decrypt",
+        "category": "SecretLens"
+      },
+      {
+        "title": "Decrypt file",
+        "command": "secretlens.decryptFile",
+        "category": "SecretLens"
+      },
+      {
+        "title": "Decrypt directory files",
+        "command": "secretlens.decryptDir",
+        "category": "SecretLens"
+      },
+      {
+        "title": "Set password",
+        "command": "secretlens.setPassword",
+        "category": "SecretLens"
+      },
+      {
+        "title": "Forget password",
+        "command": "secretlens.forgetPassword",
+        "category": "SecretLens"
+      },
+      {
+        "title": "Copy secret",
+        "command": "secretlens.copySecret",
+        "category": "SecretLens"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "secretlens.encrypt",
+        "key": "ctrl+l ctrl+e",
+        "mac": "cmd+l cmd+e"
+      },
+      {
+        "command": "secretlens.decrypt",
+        "key": "ctrl+l ctrl+d",
+        "mac": "cmd+l cmd+d"
+      },
+      {
+        "command": "secretlens.setPassword",
+        "key": "ctrl+l ctrl+p",
+        "mac": "cmd+l cmd+p"
+      },
+      {
+        "command": "secretlens.forgetPassword",
+        "key": "ctrl+l ctrl+f",
+        "mac": "cmd+l cmd+f"
+      },
+      {
+        "command": "secretlens.copySecret",
+        "key": "ctrl+l ctrl+c",
+        "mac": "cmd+l cmd+c"
+      }
+    ],
+    "configuration": {
+      "title": "SecretLens",
+      "properties": {
+        "secretlens.displayType": {
+          "title": "How to display the secret",
+          "description": "Display the secret as a inline CodeLens, a Hover Provider or Both.\nThe extensions must be reloaded to this setting take effect.",
+          "type": "string",
+          "enum": [
+            "CodeLens",
+            "Hover",
+            "Both"
+          ],
+          "default": "CodeLens"
+        },
+        "secretlens.token": {
+          "title": "Start Token",
+          "description": "Start token for identifying the encrypted text",
+          "type": "string",
+          "default": "<sl:"
+        },
+        "secretlens.endToken": {
+          "title": "End Token",
+          "description": "End token for identifying the encrypted text. Defaults to same as token",
+          "type": "string",
+          "default": ":sl>"
+        },
+        "secretlens.excludeEnd": {
+          "title": "Exclude end fence",
+          "description": "Should the end fence be excluded when encrypting texts",
+          "type": "boolean",
+          "default": false
+        },
+        "secretlens.languages": {
+          "title": "Language identifiers",
+          "description": "Language identifiers in which the extension will act",
+          "type": "array",
+          "default": [
+            "*"
+          ]
+        },
+        "secretlens.copySeparator": {
+          "title": "Copy separator",
+          "description": "Separator for when copying multiple secrets",
+          "type": "string",
+          "default": "\n"
+        },
+        "secretlens.rememberPeriod": {
+          "title": "Remember period",
+          "description": "How many seconds the password will be remembered before being erased from cache",
+          "type": "integer",
+          "default": -1
+        },
+        "secretlens.recursiveDirectories": {
+          "title": "Recursive",
+          "description": "Go inside subdirectories to encrypt/decrypt files",
+          "type": "boolean",
+          "default": false
+        },
+        "secretlens.cryptoMethod": {
+          "title": "Crypto method",
+          "description": "How the secrets are encrypted.\ndefault: legacy implementation\npbkdf2: openssl password based key derivation function 2\n    equivalent to shell command [openssl enc -aes-256-cbc -pbkdf2 | xxd -p]\n    decrypt with [xxd -p -r | openssl enc -aes-256-cbc -pbkdf2 -d]",
+          "type": "string",
+          "enum": [
+            "legacy",
+            "pbkdf2"
+          ],
+          "default": "legacy"
+        }
+      }
     }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run -S esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run -S esbuild-base -- --sourcemap",
+    "watch": "npm run -S esbuild-base -- --sourcemap --watch",
+    "test-compile": "tsc -p ./",
+    "lint": "eslint .",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.0",
+    "@types/node": "^14.17.27",
+    "@types/vscode": "^1.34.0",
+    "@vscode/test-electron": "^1.6.2",
+    "esbuild": "^0.13.8",
+    "glob": "^7.1.2",
+    "mocha": "^5.2.0",
+    "tslint": "^5.16.0",
+    "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "clipboardy": "^3.0.0"
+  }
 }
