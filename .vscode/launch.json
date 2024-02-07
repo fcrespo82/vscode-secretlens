@@ -14,9 +14,6 @@
                 "--disable-extensions",
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ],
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
-            ],
             "preLaunchTask": "npm: esbuild",
             "smartStep": true
         },
@@ -29,9 +26,6 @@
                 "--disable-extensions",
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 "--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
-            ],
-            "outFiles": [
-                "${workspaceFolder}/out/test/**/*.js"
             ],
             "internalConsoleOptions": "openOnSessionStart",
             "preLaunchTask": "npm: test-compile"
