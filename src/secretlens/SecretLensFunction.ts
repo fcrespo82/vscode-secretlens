@@ -61,7 +61,6 @@ export class SecretLensFunction implements interfaces.ISecretLensFunction {
         if (inputText.search("pbkdf2:") == 0) {
 
             // Equivalent shell command: xxd -p -r | openssl enc -aes-256-cbc -pbkdf2 -d
-            //
             inputText = inputText.slice(7);
             var hexsalt = inputText.substring(16, 32);
             var binsalt = Buffer.from(hexsalt, 'hex')
